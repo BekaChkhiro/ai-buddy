@@ -19,7 +19,12 @@
       "Bash(then grep -q \"ANTHROPIC_API_KEY\" .env.local)",
       "Bash(else echo \"❌ .env.local file not found\")",
       "Bash(fi)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(else echo \"✗ .env.local file not found\")",
+      "Bash(awk:*)",
+      "WebSearch",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:claude.com)"
     ],
     "deny": [],
     "ask": []

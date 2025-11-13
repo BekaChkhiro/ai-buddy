@@ -7,21 +7,21 @@ import { ClaudeModel } from "./types";
 
 /**
  * Default Claude model to use
- * Sonnet 3.5 (October 2024) - Best balance of performance and cost
+ * Sonnet 4.5 (September 2025) - Best balance of performance and cost
  */
-export const DEFAULT_MODEL: ClaudeModel = "claude-3-5-sonnet-20241022";
+export const DEFAULT_MODEL: ClaudeModel = "claude-sonnet-4-5-20250929";
 
 /**
  * Model for faster, cheaper operations
- * Haiku 3.5 (October 2024) - Fast and economical
+ * Haiku 4.5 (October 2025) - Fast and economical
  */
-export const FAST_MODEL: ClaudeModel = "claude-3-5-haiku-20241022";
+export const FAST_MODEL: ClaudeModel = "claude-haiku-4-5-20251001";
 
 /**
  * Model for complex, high-quality operations
- * Opus 3 - Highest quality and reasoning
+ * Opus 4.1 (August 2025) - Highest quality and reasoning
  */
-export const PREMIUM_MODEL: ClaudeModel = "claude-3-opus-20240229";
+export const PREMIUM_MODEL: ClaudeModel = "claude-opus-4-1-20250805";
 
 /**
  * Maximum tokens for response
@@ -74,18 +74,18 @@ export const RATE_LIMIT_CONFIG = {
 
 /**
  * Token pricing per million tokens (USD)
- * Prices as of October 2024 - check https://www.anthropic.com/pricing for updates
+ * Prices as of 2025 - check https://www.anthropic.com/pricing for updates
  */
 export const TOKEN_PRICING: Record<ClaudeModel, { input: number; output: number }> = {
-  "claude-3-5-sonnet-20241022": {
+  "claude-sonnet-4-5-20250929": {
     input: 3.0,
     output: 15.0,
   },
-  "claude-3-5-haiku-20241022": {
-    input: 0.8,
-    output: 4.0,
+  "claude-haiku-4-5-20251001": {
+    input: 1.0,
+    output: 5.0,
   },
-  "claude-3-opus-20240229": {
+  "claude-opus-4-1-20250805": {
     input: 15.0,
     output: 75.0,
   },
