@@ -3,24 +3,20 @@
  * Includes sidebar navigation, user menu, and main content area
  */
 
-import type { Metadata } from 'next'
-import { Sidebar } from '@/components/dashboard/Sidebar'
-import { UserMenu } from '@/components/auth/UserMenu'
-import { Toaster } from '@/components/ui/toaster'
+import type { Metadata } from "next";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { UserMenu } from "@/components/auth/UserMenu";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: {
-    default: 'Dashboard',
-    template: '%s | Claude Project Manager',
+    default: "Dashboard",
+    template: "%s | Claude Project Manager",
   },
-  description: 'Manage your projects with AI assistance',
-}
+  description: "Manage your projects with AI assistance",
+};
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -41,13 +37,11 @@ export default function DashboardLayout({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto bg-background p-6">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto bg-background p-6">{children}</main>
       </div>
 
       {/* Toast notifications */}
       <Toaster />
     </div>
-  )
+  );
 }

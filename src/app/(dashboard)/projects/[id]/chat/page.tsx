@@ -3,46 +3,46 @@
  * Project chat interface with split view
  */
 
-import { Suspense } from 'react'
-import { createServerClient } from '@/lib/supabase/server'
-import { getProjectById } from '@/lib/supabase/queries'
-import { ChatInterface } from '@/components/chat/ChatInterface'
-import { Loader2 } from 'lucide-react'
-import { notFound, redirect } from 'next/navigation'
+import { Suspense } from "react";
+import { createServerClient } from "@/lib/supabase/server";
+import { getProjectById } from "@/lib/supabase/queries";
+import { ChatInterface } from "@/components/chat/ChatInterface";
+import { Loader2 } from "lucide-react";
+import { notFound, redirect } from "next/navigation";
 
 interface ChatPageProps {
   params: Promise<{
-    id: string
-  }>
+    id: string;
+  }>;
   searchParams: Promise<{
-    conversation?: string
-  }>
+    conversation?: string;
+  }>;
 }
 
 export default async function ChatPage({ params, searchParams }: ChatPageProps) {
-  const resolvedParams = await params
-  const resolvedSearchParams = await searchParams
-  const supabase = await createServerClient()
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+  const supabase = await createServerClient();
 
   // Check authentication
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login')
+    redirect("/login");
   }
 
   // Get project
-  const project = await getProjectById(supabase, resolvedParams.id)
+  const project = await getProjectById(supabase, resolvedParams.id);
 
   if (!project) {
-    notFound()
+    notFound();
   }
 
   // Verify ownership
   if (project.userId !== user.id) {
-    redirect('/projects')
+    redirect("/projects");
   }
 
   return (
@@ -76,17 +76,17 @@ export default async function ChatPage({ params, searchParams }: ChatPageProps) 
         </Suspense>
       </div>
     </div>
-  )
+  );
 }
 
 // Metadata
 export async function generateMetadata({ params }: ChatPageProps) {
-  const resolvedParams = await params
-  const supabase = await createServerClient()
-  const project = await getProjectById(supabase, resolvedParams.id)
+  const resolvedParams = await params;
+  const supabase = await createServerClient();
+  const project = await getProjectById(supabase, resolvedParams.id);
 
   return {
-    title: project ? `Chat - ${project.name}` : 'Chat',
-    description: 'AI-powered chat assistant for your project',
-  }
+    title: project ? `Chat - ${project.name}` : "Chat",
+    description: "AI-powered chat assistant for your project",
+  };
 }

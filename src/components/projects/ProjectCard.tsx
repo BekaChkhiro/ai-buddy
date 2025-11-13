@@ -3,32 +3,35 @@
  * Card component for displaying project in grid/list view
  */
 
-import Link from 'next/link'
-import { FolderKanban } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Project } from '@/types'
+import Link from "next/link";
+import { FolderKanban } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Project } from "@/types";
 
 interface ProjectCardProps {
-  project: Project & { taskCount?: number; completedTaskCount?: number }
-  className?: string
+  project: Project & { taskCount?: number; completedTaskCount?: number };
+  className?: string;
 }
 
 export function ProjectCard({ project, className }: ProjectCardProps) {
-  const completionRate = project.taskCount && project.taskCount > 0
-    ? Math.round((project.completedTaskCount || 0) / project.taskCount * 100)
-    : 0
+  const completionRate =
+    project.taskCount && project.taskCount > 0
+      ? Math.round(((project.completedTaskCount || 0) / project.taskCount) * 100)
+      : 0;
 
   return (
     <Link href={`/projects/${project.id}`}>
-      <Card className={`hover:bg-accent transition-colors cursor-pointer h-full ${className || ''}`}>
+      <Card
+        className={`hover:bg-accent transition-colors cursor-pointer h-full ${className || ""}`}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FolderKanban className="h-5 w-5 text-primary" />
             {project.name}
           </CardTitle>
           <CardDescription className="line-clamp-2">
-            {project.description || 'No description'}
+            {project.description || "No description"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -56,21 +59,17 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
                 </Badge>
               ))}
               {project.techStack.length > 3 && (
-                <Badge variant="outline">
-                  +{project.techStack.length - 3} more
-                </Badge>
+                <Badge variant="outline">+{project.techStack.length - 3} more</Badge>
               )}
             </div>
           )}
 
           {/* Folder path if exists */}
           {project.folderPath && (
-            <div className="mt-3 text-xs text-muted-foreground truncate">
-              {project.folderPath}
-            </div>
+            <div className="mt-3 text-xs text-muted-foreground truncate">{project.folderPath}</div>
           )}
         </CardContent>
       </Card>
     </Link>
-  )
+  );
 }

@@ -3,73 +3,80 @@
  * Main chat state management integrating messages and streaming
  */
 
-'use client'
+"use client";
 
-import { useState, useCallback, useRef, useEffect } from 'react'
-import { createBrowserClient } from '@/lib/supabase/client'
-import { useMessages, Message } from './useMessages'
-import { useStreaming } from './useStreaming'
+import { useState, useCallback, useRef, useEffect } from "react";
+import { createBrowserClient } from "@/lib/supabase/client";
+import { useMessages, Message } from "./useMessages";
+import { useStreaming } from "./useStreaming";
 
-export type ChatMode = 'planning' | 'implementation' | 'review' | 'general'
+export type ChatMode = "planning" | "implementation" | "review" | "general";
 
 export interface Conversation {
-  id: string
-  projectId: string
-  userId: string
-  title: string | null
-  mode: ChatMode
-  contextFiles: string[]
-  createdAt: string
-  updatedAt: string
+  id: string;
+  project_id: string;
+  user_id: string;
+  title: string | null;
+  mode: ChatMode;
+  context_files: string[];
+  created_at: string;
+  updated_at: string;
 }
 
 interface UseChatOptions {
-  projectId: string
-  conversationId?: string
-  mode?: ChatMode
-  contextFiles?: string[]
+  projectId: string;
+  conversationId?: string;
+  mode?: ChatMode;
+  contextFiles?: string[];
 }
 
 interface UseChatReturn {
   // Conversation state
-  conversation: Conversation | null
-  conversations: Conversation[]
-  loadingConversations: boolean
+  conversation: Conversation | null;
+  conversations: Conversation[];
+  loadingConversations: boolean;
 
   // Messages state
-  messages: Message[]
-  loadingMessages: boolean
+  messages: Message[];
+  loadingMessages: boolean;
 
   // Streaming state
-  isStreaming: boolean
-  streamingContent: string
+  isStreaming: boolean;
+  streamingContent: string;
 
   // Error state
-  error: string | null
+  error: string | null;
 
   // Actions
-  sendMessage: (content: string) => Promise<void>
-  stopStreaming: () => void
-  createConversation: (title?: string) => Promise<Conversation | null>
-  switchConversation: (conversationId: string) => Promise<void>
-  deleteConversation: (conversationId: string) => Promise<void>
-  updateConversationMode: (mode: ChatMode) => Promise<void>
-  updateContextFiles: (files: string[]) => Promise<void>
-  regenerateLastMessage: () => Promise<void>
-  editMessage: (messageId: string, content: string) => Promise<void>
+  sendMessage: (content: string) => Promise<void>;
+  stopStreaming: () => void;
+  createConversation: (title?: string) => Promise<Conversation | null>;
+  switchConversation: (conversationId: string) => Promise<void>;
+  deleteConversation: (conversationId: string) => Promise<void>;
+  updateConversationMode: (mode: ChatMode) => Promise<void>;
+  updateContextFiles: (files: string[]) => Promise<void>;
+  regenerateLastMessage: () => Promise<void>;
+  editMessage: (messageId: string, content: string) => Promise<void>;
 }
 
 export function useChat(options: UseChatOptions): UseChatReturn {
-  const { projectId, conversationId: initialConversationId, mode = 'general', contextFiles = [] } = options
+  const {
+    projectId,
+    conversationId: initialConversationId,
+    mode = "general",
+    contextFiles = [],
+  } = options;
 
-  const [conversation, setConversation] = useState<Conversation | null>(null)
-  const [conversations, setConversations] = useState<Conversation[]>([])
-  const [loadingConversations, setLoadingConversations] = useState(false)
-  const [currentConversationId, setCurrentConversationId] = useState<string | undefined>(initialConversationId)
-  const [error, setError] = useState<string | null>(null)
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [loadingConversations, setLoadingConversations] = useState(false);
+  const [currentConversationId, setCurrentConversationId] = useState<string | undefined>(
+    initialConversationId
+  );
+  const [error, setError] = useState<string | null>(null);
 
-  const lastUserMessageRef = useRef<string>('')
-  const supabase = createBrowserClient()
+  const lastUserMessageRef = useRef<string>("");
+  const supabase = createBrowserClient();
 
   // Use messages hook
   const {
@@ -81,7 +88,7 @@ export function useChat(options: UseChatOptions): UseChatReturn {
   } = useMessages({
     conversationId: currentConversationId,
     autoFetch: true,
-  })
+  });
 
   // Use streaming hook
   const {
@@ -91,61 +98,63 @@ export function useChat(options: UseChatOptions): UseChatReturn {
     startStreaming,
     stopStreaming,
     resetContent,
-  } = useStreaming()
+  } = useStreaming();
 
   // Fetch conversations for project
   const fetchConversations = useCallback(async () => {
-    setLoadingConversations(true)
+    setLoadingConversations(true);
     try {
       const { data, error: fetchError } = await supabase
-        .from('conversations')
-        .select('*')
-        .eq('project_id', projectId)
-        .order('updated_at', { ascending: false })
+        .from("conversations")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("updated_at", { ascending: false });
 
-      if (fetchError) throw fetchError
+      if (fetchError) throw fetchError;
 
-      setConversations(data || [])
+      setConversations(data || []);
     } catch (err: any) {
-      console.error('Error fetching conversations:', err)
-      setError(err.message || 'Failed to fetch conversations')
+      console.error("Error fetching conversations:", err);
+      setError(err.message || "Failed to fetch conversations");
     } finally {
-      setLoadingConversations(false)
+      setLoadingConversations(false);
     }
-  }, [projectId, supabase])
+  }, [projectId, supabase]);
 
   // Fetch current conversation details
   const fetchConversation = useCallback(async () => {
     if (!currentConversationId) {
-      setConversation(null)
-      return
+      setConversation(null);
+      return;
     }
 
     try {
       const { data, error: fetchError } = await supabase
-        .from('conversations')
-        .select('*')
-        .eq('id', currentConversationId)
-        .single()
+        .from("conversations")
+        .select("*")
+        .eq("id", currentConversationId)
+        .single();
 
-      if (fetchError) throw fetchError
+      if (fetchError) throw fetchError;
 
-      setConversation(data)
+      setConversation(data);
     } catch (err: any) {
-      console.error('Error fetching conversation:', err)
-      setError(err.message || 'Failed to fetch conversation')
+      console.error("Error fetching conversation:", err);
+      setError(err.message || "Failed to fetch conversation");
     }
-  }, [currentConversationId, supabase])
+  }, [currentConversationId, supabase]);
 
   // Create new conversation
   const createConversation = useCallback(
     async (title?: string): Promise<Conversation | null> => {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) throw new Error('Not authenticated')
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error("Not authenticated");
 
         const { data, error: createError } = await supabase
-          .from('conversations')
+          .from("conversations")
           .insert({
             project_id: projectId,
             user_id: user.id,
@@ -154,158 +163,161 @@ export function useChat(options: UseChatOptions): UseChatReturn {
             context_files: contextFiles,
           })
           .select()
-          .single()
+          .single();
 
-        if (createError) throw createError
+        if (createError) throw createError;
 
-        setConversations((prev) => [data, ...prev])
-        setCurrentConversationId(data.id)
-        setConversation(data)
+        setConversations((prev) => [data, ...prev]);
+        setCurrentConversationId(data.id);
+        setConversation(data);
 
-        return data
+        return data;
       } catch (err: any) {
-        console.error('Error creating conversation:', err)
-        setError(err.message || 'Failed to create conversation')
-        return null
+        console.error("Error creating conversation:", err);
+        setError(err.message || "Failed to create conversation");
+        return null;
       }
     },
     [projectId, mode, contextFiles, supabase]
-  )
+  );
 
   // Switch to different conversation
-  const switchConversation = useCallback(async (conversationId: string) => {
-    setCurrentConversationId(conversationId)
-    resetContent()
-  }, [resetContent])
+  const switchConversation = useCallback(
+    async (conversationId: string) => {
+      setCurrentConversationId(conversationId);
+      resetContent();
+    },
+    [resetContent]
+  );
 
   // Delete conversation
   const deleteConversation = useCallback(
     async (conversationId: string) => {
       try {
         const { error: deleteError } = await supabase
-          .from('conversations')
+          .from("conversations")
           .delete()
-          .eq('id', conversationId)
+          .eq("id", conversationId);
 
-        if (deleteError) throw deleteError
+        if (deleteError) throw deleteError;
 
-        setConversations((prev) => prev.filter((c) => c.id !== conversationId))
+        setConversations((prev) => prev.filter((c) => c.id !== conversationId));
 
         // If deleting current conversation, switch to first available
         if (conversationId === currentConversationId) {
-          const remaining = conversations.filter((c) => c.id !== conversationId)
+          const remaining = conversations.filter((c) => c.id !== conversationId);
           if (remaining.length > 0) {
-            setCurrentConversationId(remaining[0].id)
+            setCurrentConversationId(remaining[0]!.id);
           } else {
-            setCurrentConversationId(undefined)
-            setConversation(null)
+            setCurrentConversationId(undefined);
+            setConversation(null);
           }
         }
       } catch (err: any) {
-        console.error('Error deleting conversation:', err)
-        setError(err.message || 'Failed to delete conversation')
+        console.error("Error deleting conversation:", err);
+        setError(err.message || "Failed to delete conversation");
       }
     },
     [currentConversationId, conversations, supabase]
-  )
+  );
 
   // Update conversation mode
   const updateConversationMode = useCallback(
     async (newMode: ChatMode) => {
-      if (!currentConversationId) return
+      if (!currentConversationId) return;
 
       try {
         const { error: updateError } = await supabase
-          .from('conversations')
+          .from("conversations")
           .update({ mode: newMode })
-          .eq('id', currentConversationId)
+          .eq("id", currentConversationId);
 
-        if (updateError) throw updateError
+        if (updateError) throw updateError;
 
-        setConversation((prev) => prev ? { ...prev, mode: newMode } : null)
+        setConversation((prev) => (prev ? { ...prev, mode: newMode } : null));
       } catch (err: any) {
-        console.error('Error updating conversation mode:', err)
-        setError(err.message || 'Failed to update mode')
+        console.error("Error updating conversation mode:", err);
+        setError(err.message || "Failed to update mode");
       }
     },
     [currentConversationId, supabase]
-  )
+  );
 
   // Update context files
   const updateContextFiles = useCallback(
     async (files: string[]) => {
-      if (!currentConversationId) return
+      if (!currentConversationId) return;
 
       try {
         const { error: updateError } = await supabase
-          .from('conversations')
+          .from("conversations")
           .update({ context_files: files })
-          .eq('id', currentConversationId)
+          .eq("id", currentConversationId);
 
-        if (updateError) throw updateError
+        if (updateError) throw updateError;
 
-        setConversation((prev) => prev ? { ...prev, contextFiles: files } : null)
+        setConversation((prev) => (prev ? { ...prev, contextFiles: files } : null));
       } catch (err: any) {
-        console.error('Error updating context files:', err)
-        setError(err.message || 'Failed to update context files')
+        console.error("Error updating context files:", err);
+        setError(err.message || "Failed to update context files");
       }
     },
     [currentConversationId, supabase]
-  )
+  );
 
   // Send message and get streaming response
   const sendMessage = useCallback(
     async (content: string) => {
       try {
-        setError(null)
-        resetContent()
+        setError(null);
+        resetContent();
 
         // Create conversation if it doesn't exist
-        let convId = currentConversationId
+        let convId = currentConversationId;
         if (!convId) {
-          const newConv = await createConversation()
+          const newConv = await createConversation();
           if (!newConv) {
-            throw new Error('Failed to create conversation')
+            throw new Error("Failed to create conversation");
           }
-          convId = newConv.id
+          convId = newConv.id;
         }
 
         // Save user message to database
         const userMessage = await addMessage({
-          conversationId: convId,
-          parentId: null,
-          role: 'user',
+          conversation_id: convId,
+          parent_id: null,
+          role: "user",
           content,
           metadata: {},
-        })
+        });
 
         if (!userMessage) {
-          throw new Error('Failed to save user message')
+          throw new Error("Failed to save user message");
         }
 
-        lastUserMessageRef.current = content
+        lastUserMessageRef.current = content;
 
         // Build conversation history
         const conversationHistory = messages.map((msg) => ({
-          role: msg.role as 'user' | 'assistant',
+          role: msg.role as "user" | "assistant",
           content: msg.content,
-        }))
+        }));
 
         // Start streaming response
-        await startStreaming('/api/claude/chat', {
+        await startStreaming("/api/claude/chat", {
           projectId,
           message: content,
           conversationHistory,
           includeProjectContext: true,
-          contextFiles: conversation?.contextFiles || contextFiles,
+          contextFiles: conversation?.context_files || contextFiles,
           mode: conversation?.mode || mode,
-        })
+        });
 
         // After streaming completes, save assistant message
         // Note: This will be called after the streaming hook finishes
       } catch (err: any) {
-        console.error('Error sending message:', err)
-        setError(err.message || 'Failed to send message')
+        console.error("Error sending message:", err);
+        setError(err.message || "Failed to send message");
       }
     },
     [
@@ -320,63 +332,63 @@ export function useChat(options: UseChatOptions): UseChatReturn {
       mode,
       resetContent,
     ]
-  )
+  );
 
   // Save assistant message after streaming completes
   useEffect(() => {
     if (!isStreaming && streamingContent && currentConversationId) {
       // Save the streamed content as assistant message
       addMessage({
-        conversationId: currentConversationId,
-        parentId: null,
-        role: 'assistant',
+        conversation_id: currentConversationId,
+        parent_id: null,
+        role: "assistant",
         content: streamingContent,
         metadata: {},
       }).then(() => {
-        resetContent()
-      })
+        resetContent();
+      });
     }
-  }, [isStreaming, streamingContent, currentConversationId, addMessage, resetContent])
+  }, [isStreaming, streamingContent, currentConversationId, addMessage, resetContent]);
 
   // Regenerate last assistant message
   const regenerateLastMessage = useCallback(async () => {
-    if (!lastUserMessageRef.current) return
+    if (!lastUserMessageRef.current) return;
 
     // Delete last assistant message
-    const lastAssistantMessage = [...messages].reverse().find((msg) => msg.role === 'assistant')
+    const lastAssistantMessage = [...messages].reverse().find((msg) => msg.role === "assistant");
     if (lastAssistantMessage) {
-      await deleteMessage(lastAssistantMessage.id)
+      await deleteMessage(lastAssistantMessage.id);
     }
 
     // Resend last user message
-    await sendMessage(lastUserMessageRef.current)
-  }, [messages, deleteMessage, sendMessage])
+    await sendMessage(lastUserMessageRef.current);
+  }, [messages, deleteMessage, sendMessage]);
 
   // Edit message
   const editMessage = useCallback(
     async (messageId: string, content: string) => {
-      await updateMessage(messageId, content)
+      await updateMessage(messageId, content);
     },
     [updateMessage]
-  )
+  );
 
   // Initialize: fetch conversations and current conversation
   useEffect(() => {
-    fetchConversations()
-  }, [fetchConversations])
+    fetchConversations();
+  }, [fetchConversations]);
 
   useEffect(() => {
     if (currentConversationId) {
-      fetchConversation()
+      fetchConversation();
     }
-  }, [currentConversationId, fetchConversation])
+  }, [currentConversationId, fetchConversation]);
 
   // Merge streaming error with general error
   useEffect(() => {
     if (streamingError) {
-      setError(streamingError)
+      setError(streamingError);
     }
-  }, [streamingError])
+  }, [streamingError]);
 
   return {
     // Conversation state
@@ -405,5 +417,5 @@ export function useChat(options: UseChatOptions): UseChatReturn {
     updateContextFiles,
     regenerateLastMessage,
     editMessage,
-  }
+  };
 }

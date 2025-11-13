@@ -3,103 +3,103 @@
  * Fetch and manage all projects
  */
 
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback } from 'react'
-import { Project, ApiResponse } from '@/types'
+import { useState, useEffect, useCallback } from "react";
+import { Project, ApiResponse } from "@/types";
 
 interface UseProjectsOptions {
-  autoFetch?: boolean
-  sortField?: string
-  sortDirection?: 'asc' | 'desc'
+  autoFetch?: boolean;
+  sortField?: string;
+  sortDirection?: "asc" | "desc";
 }
 
 interface UseProjectsReturn {
-  projects: Project[]
-  isLoading: boolean
-  error: string | null
-  refetch: () => Promise<void>
+  projects: Project[];
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
   createProject: (data: {
-    name: string
-    description?: string
-    folderPath?: string
-    techStack?: string[]
-  }) => Promise<Project | null>
+    name: string;
+    description?: string;
+    folderPath?: string;
+    techStack?: string[];
+  }) => Promise<Project | null>;
 }
 
 export function useProjects(options: UseProjectsOptions = {}): UseProjectsReturn {
-  const { autoFetch = true, sortField, sortDirection } = options
+  const { autoFetch = true, sortField, sortDirection } = options;
 
-  const [projects, setProjects] = useState<Project[]>([])
-  const [isLoading, setIsLoading] = useState(autoFetch)
-  const [error, setError] = useState<string | null>(null)
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(autoFetch);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchProjects = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
     try {
-      const params = new URLSearchParams()
-      if (sortField) params.append('sortField', sortField)
-      if (sortDirection) params.append('sortDirection', sortDirection)
+      const params = new URLSearchParams();
+      if (sortField) params.append("sortField", sortField);
+      if (sortDirection) params.append("sortDirection", sortDirection);
 
-      const response = await fetch(`/api/projects?${params.toString()}`)
-      const result: ApiResponse<Project[]> = await response.json()
+      const response = await fetch(`/api/projects?${params.toString()}`);
+      const result: ApiResponse<Project[]> = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error?.message || 'Failed to fetch projects')
+        throw new Error(result.error?.message || "Failed to fetch projects");
       }
 
-      setProjects(result.data || [])
+      setProjects(result.data || []);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch projects'
-      setError(message)
-      console.error('Error fetching projects:', err)
+      const message = err instanceof Error ? err.message : "Failed to fetch projects";
+      setError(message);
+      console.error("Error fetching projects:", err);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [sortField, sortDirection])
+  }, [sortField, sortDirection]);
 
   const createProject = useCallback(
     async (data: {
-      name: string
-      description?: string
-      folderPath?: string
-      techStack?: string[]
+      name: string;
+      description?: string;
+      folderPath?: string;
+      techStack?: string[];
     }): Promise<Project | null> => {
       try {
-        const response = await fetch('/api/projects', {
-          method: 'POST',
+        const response = await fetch("/api/projects", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
-        })
+        });
 
-        const result: ApiResponse<Project> = await response.json()
+        const result: ApiResponse<Project> = await response.json();
 
         if (!response.ok || !result.success) {
-          throw new Error(result.error?.message || 'Failed to create project')
+          throw new Error(result.error?.message || "Failed to create project");
         }
 
         // Refresh projects list
-        await fetchProjects()
+        await fetchProjects();
 
-        return result.data || null
+        return result.data || null;
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to create project'
-        setError(message)
-        console.error('Error creating project:', err)
-        return null
+        const message = err instanceof Error ? err.message : "Failed to create project";
+        setError(message);
+        console.error("Error creating project:", err);
+        return null;
       }
     },
     [fetchProjects]
-  )
+  );
 
   useEffect(() => {
     if (autoFetch) {
-      fetchProjects()
+      fetchProjects();
     }
-  }, [autoFetch, fetchProjects])
+  }, [autoFetch, fetchProjects]);
 
   return {
     projects,
@@ -107,5 +107,5 @@ export function useProjects(options: UseProjectsOptions = {}): UseProjectsReturn
     error,
     refetch: fetchProjects,
     createProject,
-  }
+  };
 }

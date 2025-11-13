@@ -3,61 +3,61 @@
  * Form for creating a new project
  */
 
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ProjectForm } from '@/components/projects'
-import { useToast } from '@/hooks/use-toast'
-import { CreateProjectForm } from '@/types'
-import { ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProjectForm } from "@/components/projects";
+import { useToast } from "@/hooks/use-toast";
+import { CreateProjectForm } from "@/types";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function NewProjectPage() {
-  const router = useRouter()
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (data: CreateProjectForm) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/projects', {
-        method: 'POST',
+      const response = await fetch("/api/projects", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      })
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error?.message || 'Failed to create project')
+        throw new Error(result.error?.message || "Failed to create project");
       }
 
       toast({
-        title: 'Project created',
+        title: "Project created",
         description: `${data.name} has been created successfully.`,
-      })
+      });
 
       // Redirect to the new project page
-      router.push(`/projects/${result.data.id}`)
+      router.push(`/projects/${result.data.id}`);
     } catch (error) {
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to create project',
-        variant: 'destructive',
-      })
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create project",
+        variant: "destructive",
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleCancel = () => {
-    router.push('/projects')
-  }
+    router.push("/projects");
+  };
 
   return (
     <div className="space-y-6">
@@ -80,18 +80,12 @@ export default function NewProjectPage() {
       <Card className="max-w-3xl">
         <CardHeader>
           <CardTitle>Project Details</CardTitle>
-          <CardDescription>
-            Fill in the information below to create your project
-          </CardDescription>
+          <CardDescription>Fill in the information below to create your project</CardDescription>
         </CardHeader>
         <CardContent>
-          <ProjectForm
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            isLoading={isLoading}
-          />
+          <ProjectForm onSubmit={handleSubmit} onCancel={handleCancel} isLoading={isLoading} />
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

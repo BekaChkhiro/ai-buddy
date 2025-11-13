@@ -3,9 +3,9 @@
  * Confirmation dialog for deleting projects
  */
 
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,19 +14,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { AlertTriangle } from 'lucide-react'
-import { Project } from '@/types'
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AlertTriangle } from "lucide-react";
+import { Project } from "@/types";
 
 interface DeleteProjectDialogProps {
-  project: Project
-  onConfirm: () => Promise<void>
-  trigger?: React.ReactNode
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
+  project: Project;
+  onConfirm: () => Promise<void>;
+  trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function DeleteProjectDialog({
@@ -34,38 +34,38 @@ export function DeleteProjectDialog({
   onConfirm,
   trigger,
   open: controlledOpen,
-  onOpenChange: controlledOnOpenChange
+  onOpenChange: controlledOnOpenChange,
 }: DeleteProjectDialogProps) {
-  const [internalOpen, setInternalOpen] = useState(false)
-  const [confirmText, setConfirmText] = useState('')
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
-  const setOpen = controlledOnOpenChange || setInternalOpen
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = controlledOnOpenChange || setInternalOpen;
 
   const handleConfirm = async () => {
     if (confirmText !== project.name) {
-      return
+      return;
     }
 
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
-      await onConfirm()
-      setOpen(false)
-      setConfirmText('')
+      await onConfirm();
+      setOpen(false);
+      setConfirmText("");
     } catch (error) {
-      console.error('Error deleting project:', error)
+      console.error("Error deleting project:", error);
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
-      setConfirmText('')
+      setConfirmText("");
     }
-    setOpen(newOpen)
-  }
+    setOpen(newOpen);
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -121,10 +121,10 @@ export function DeleteProjectDialog({
             onClick={handleConfirm}
             disabled={confirmText !== project.name || isDeleting}
           >
-            {isDeleting ? 'Deleting...' : 'Delete Project'}
+            {isDeleting ? "Deleting..." : "Delete Project"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

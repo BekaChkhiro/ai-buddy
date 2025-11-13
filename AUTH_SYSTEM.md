@@ -57,6 +57,7 @@ src/
 ## Features
 
 ### 1. User Registration
+
 - Email and password signup
 - Full name capture
 - Password strength validation (8+ chars, uppercase, lowercase, numbers)
@@ -64,30 +65,35 @@ src/
 - Automatic profile creation via database trigger
 
 ### 2. User Login
+
 - Email and password authentication
 - Remember me (handled by Supabase)
 - Error handling for invalid credentials
 - Redirect to intended page after login
 
 ### 3. Password Reset
+
 - Request reset email
 - Secure reset link with token
 - Password strength validation
 - Confirmation field
 
 ### 4. Session Management
+
 - Automatic session refresh
 - Session validation
 - Secure cookie storage
 - Server and client-side session access
 
 ### 5. Route Protection
+
 - Middleware-based protection for dashboard routes
 - Client-side AuthGuard component
 - Automatic redirect to login for unauthenticated users
 - Redirect authenticated users away from auth pages
 
 ### 6. User Menu
+
 - Profile avatar display
 - User name and email
 - Links to profile and settings
@@ -145,75 +151,82 @@ src/
 ### Auth Functions (`lib/auth/auth.ts`)
 
 #### `signUp(credentials)`
+
 Create a new user account.
 
 ```typescript
 const result = await signUp({
-  email: 'user@example.com',
-  password: 'SecurePass123',
-  fullName: 'John Doe'
-})
+  email: "user@example.com",
+  password: "SecurePass123",
+  fullName: "John Doe",
+});
 
 if (result.success) {
-  console.log('User created:', result.data)
+  console.log("User created:", result.data);
 } else {
-  console.error('Error:', result.error?.message)
+  console.error("Error:", result.error?.message);
 }
 ```
 
 #### `signIn(credentials)`
+
 Sign in an existing user.
 
 ```typescript
 const result = await signIn({
-  email: 'user@example.com',
-  password: 'SecurePass123'
-})
+  email: "user@example.com",
+  password: "SecurePass123",
+});
 
 if (result.success) {
-  console.log('Logged in:', result.data)
+  console.log("Logged in:", result.data);
 }
 ```
 
 #### `signOut()`
+
 Sign out the current user.
 
 ```typescript
-const result = await signOut()
+const result = await signOut();
 if (result.success) {
   // Redirect to login
 }
 ```
 
 #### `sendPasswordResetEmail(email)`
+
 Send password reset email.
 
 ```typescript
-const result = await sendPasswordResetEmail('user@example.com')
+const result = await sendPasswordResetEmail("user@example.com");
 ```
 
 #### `updatePassword(newPassword)`
+
 Update user password (requires valid reset token).
 
 ```typescript
-const result = await updatePassword('NewSecurePass123')
+const result = await updatePassword("NewSecurePass123");
 ```
 
 #### `getCurrentUser()`
+
 Get the currently authenticated user (client-side).
 
 ```typescript
-const user = await getCurrentUser()
+const user = await getCurrentUser();
 if (user) {
-  console.log('User ID:', user.id)
+  console.log("User ID:", user.id);
 }
 ```
 
 #### `isAuthenticated()`
+
 Check if user is authenticated (client-side).
 
 ```typescript
-const authenticated = await isAuthenticated()
+const authenticated = await isAuthenticated();
 if (authenticated) {
   // User is logged in
 }
@@ -223,12 +236,12 @@ if (authenticated) {
 
 ```typescript
 // Validate email format
-const isValid = isValidEmail('user@example.com') // true
+const isValid = isValidEmail("user@example.com"); // true
 
 // Validate password strength
-const validation = validatePassword('weak')
+const validation = validatePassword("weak");
 if (!validation.isValid) {
-  console.log('Errors:', validation.errors)
+  console.log("Errors:", validation.errors);
   // ['Password must be at least 8 characters long', ...]
 }
 ```
@@ -236,37 +249,40 @@ if (!validation.isValid) {
 ### Session Functions (`lib/auth/session.ts`)
 
 #### `getSession()`
+
 Get current session (client-side).
 
 ```typescript
-const session = await getSession()
+const session = await getSession();
 if (session) {
-  console.log('Expires at:', session.expires_at)
+  console.log("Expires at:", session.expires_at);
 }
 ```
 
 #### `isSessionValid(session)`
+
 Check if session is valid and not expired.
 
 ```typescript
-const valid = isSessionValid(session) // true/false
+const valid = isSessionValid(session); // true/false
 ```
 
 #### `refreshSession()`
+
 Manually refresh the session.
 
 ```typescript
-const newSession = await refreshSession()
+const newSession = await refreshSession();
 ```
 
 #### Auto-Refresh
 
 ```typescript
 // Start auto-refresh (checks every minute)
-startAutoRefresh()
+startAutoRefresh();
 
 // Stop auto-refresh
-stopAutoRefresh()
+stopAutoRefresh();
 ```
 
 ## Components
@@ -290,14 +306,14 @@ import { AuthForm } from '@/components/auth'
 Client-side route protection component.
 
 ```tsx
-import { AuthGuard } from '@/components/auth'
+import { AuthGuard } from "@/components/auth";
 
 export default function ProtectedPage() {
   return (
     <AuthGuard redirectTo="/login">
       <YourProtectedContent />
     </AuthGuard>
-  )
+  );
 }
 ```
 
@@ -306,9 +322,9 @@ export default function ProtectedPage() {
 User dropdown menu component.
 
 ```tsx
-import { UserMenu } from '@/components/auth'
+import { UserMenu } from "@/components/auth";
 
-<UserMenu />
+<UserMenu />;
 ```
 
 ## Middleware Configuration
@@ -317,10 +333,10 @@ The root `middleware.ts` file protects routes automatically:
 
 ```typescript
 // Protected routes (require authentication)
-const protectedRoutes = ["/projects", "/profile", "/settings", "/dashboard"]
+const protectedRoutes = ["/projects", "/profile", "/settings", "/dashboard"];
 
 // Auth routes (redirect to dashboard if authenticated)
-const authRoutes = ["/login", "/register", "/forgot-password"]
+const authRoutes = ["/login", "/register", "/forgot-password"];
 ```
 
 ### Adding Protected Routes
@@ -333,8 +349,8 @@ const protectedRoutes = [
   "/profile",
   "/settings",
   "/dashboard",
-  "/your-new-route"  // Add your route here
-]
+  "/your-new-route", // Add your route here
+];
 ```
 
 ## Environment Variables
@@ -351,104 +367,108 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 ### Protecting a Page (Server Component)
 
 ```tsx
-import { redirect } from 'next/navigation'
-import { createServerClient } from '@/lib/supabase/server'
+import { redirect } from "next/navigation";
+import { createServerClient } from "@/lib/supabase/server";
 
 export default async function ProtectedPage() {
-  const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login')
+    redirect("/login");
   }
 
-  return <div>Protected content for {user.email}</div>
+  return <div>Protected content for {user.email}</div>;
 }
 ```
 
 ### Protecting a Page (Client Component)
 
 ```tsx
-'use client'
+"use client";
 
-import { AuthGuard } from '@/components/auth'
+import { AuthGuard } from "@/components/auth";
 
 export default function ProtectedPage() {
   return (
     <AuthGuard>
       <div>Protected content</div>
     </AuthGuard>
-  )
+  );
 }
 ```
 
 ### Custom Login Form
 
 ```tsx
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { signIn } from '@/lib/auth'
-import { useRouter } from 'next/navigation'
+import { useState } from "react";
+import { signIn } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export default function CustomLoginForm() {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+    e.preventDefault();
 
-    const result = await signIn({ email, password })
+    const result = await signIn({ email, password });
 
     if (result.success) {
-      router.push('/dashboard')
+      router.push("/dashboard");
     } else {
-      alert(result.error?.message)
+      alert(result.error?.message);
     }
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      <input value={email} onChange={e => setEmail(e.target.value)} />
-      <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <input value={email} onChange={(e) => setEmail(e.target.value)} />
+      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
       <button type="submit">Sign In</button>
     </form>
-  )
+  );
 }
 ```
 
 ### Logout Button
 
 ```tsx
-'use client'
+"use client";
 
-import { signOut } from '@/lib/auth'
-import { useRouter } from 'next/navigation'
+import { signOut } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export function LogoutButton() {
-  const router = useRouter()
+  const router = useRouter();
 
   async function handleLogout() {
-    const result = await signOut()
+    const result = await signOut();
     if (result.success) {
-      router.push('/login')
+      router.push("/login");
     }
   }
 
-  return <button onClick={handleLogout}>Logout</button>
+  return <button onClick={handleLogout}>Logout</button>;
 }
 ```
 
 ## Security Features
 
 ### Password Requirements
+
 - Minimum 8 characters
 - At least one uppercase letter
 - At least one lowercase letter
 - At least one number
 
 ### Session Security
+
 - HTTPOnly cookies
 - Secure cookies (HTTPS only in production)
 - SameSite: Lax
@@ -456,12 +476,14 @@ export function LogoutButton() {
 - Server-side validation
 
 ### Route Protection
+
 - Middleware-level protection (runs before page loads)
 - Client-side guards (additional protection)
 - Automatic redirect for unauthorized access
 - Protected API routes via middleware
 
 ### Email Enumeration Protection
+
 - Password reset always shows success (even if email doesn't exist)
 - Prevents attackers from discovering valid emails
 
@@ -471,26 +493,26 @@ All auth functions return a consistent result object:
 
 ```typescript
 interface AuthResult<T = void> {
-  success: boolean
-  data?: T
+  success: boolean;
+  data?: T;
   error?: {
-    message: string
-    code?: string
-    field?: string
-  }
+    message: string;
+    code?: string;
+    field?: string;
+  };
 }
 ```
 
 Example error handling:
 
 ```typescript
-const result = await signIn(credentials)
+const result = await signIn(credentials);
 
 if (!result.success) {
-  if (result.error?.code === '401') {
-    console.log('Invalid credentials')
+  if (result.error?.code === "401") {
+    console.log("Invalid credentials");
   } else {
-    console.log('Error:', result.error?.message)
+    console.log("Error:", result.error?.message);
   }
 }
 ```
@@ -498,23 +520,29 @@ if (!result.success) {
 ## Troubleshooting
 
 ### Issue: "Missing Supabase environment variables"
+
 **Solution**: Create `.env.local` file with Supabase URL and anon key.
 
 ### Issue: User can't log in after registration
+
 **Solution**: Check if email verification is enabled in Supabase. If yes, user must verify email first.
 
 ### Issue: Session expires too quickly
+
 **Solution**: Adjust session timeout in Supabase dashboard → Authentication → Settings.
 
 ### Issue: Infinite redirect loop
+
 **Solution**: Check middleware configuration. Ensure auth routes and protected routes don't overlap.
 
 ### Issue: TypeScript errors with router.push()
+
 **Solution**: These are type-checking warnings from Next.js experimental typedRoutes. They don't affect functionality.
 
 ## Testing the Authentication Flow
 
 ### 1. Test Registration
+
 ```bash
 1. Navigate to /register
 2. Fill out form with valid data
@@ -525,6 +553,7 @@ if (!result.success) {
 ```
 
 ### 2. Test Login
+
 ```bash
 1. Navigate to /login
 2. Enter credentials
@@ -534,6 +563,7 @@ if (!result.success) {
 ```
 
 ### 3. Test Route Protection
+
 ```bash
 1. Log out
 2. Try to access /projects
@@ -544,6 +574,7 @@ if (!result.success) {
 ```
 
 ### 4. Test Password Reset
+
 ```bash
 1. Navigate to /forgot-password
 2. Enter email

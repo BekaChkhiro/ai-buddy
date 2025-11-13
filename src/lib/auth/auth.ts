@@ -3,22 +3,22 @@
  * Handles login, signup, password reset, and logout operations
  */
 
-import { createBrowserClient } from '@/lib/supabase/client'
+import { createBrowserClient } from "@/lib/supabase/client";
 
 // =====================================================
 // ERROR TYPES
 // =====================================================
 
 export interface AuthError {
-  message: string
-  code?: string
-  field?: string
+  message: string;
+  code?: string;
+  field?: string;
 }
 
 export interface AuthResult<T = void> {
-  success: boolean
-  data?: T
-  error?: AuthError
+  success: boolean;
+  data?: T;
+  error?: AuthError;
 }
 
 // =====================================================
@@ -26,25 +26,23 @@ export interface AuthResult<T = void> {
 // =====================================================
 
 export interface SignUpCredentials {
-  email: string
-  password: string
-  fullName?: string
+  email: string;
+  password: string;
+  fullName?: string;
 }
 
 export interface SignUpData {
-  userId: string
-  email: string
-  needsEmailVerification: boolean
+  userId: string;
+  email: string;
+  needsEmailVerification: boolean;
 }
 
 /**
  * Sign up a new user with email and password
  */
-export async function signUp(
-  credentials: SignUpCredentials
-): Promise<AuthResult<SignUpData>> {
+export async function signUp(credentials: SignUpCredentials): Promise<AuthResult<SignUpData>> {
   try {
-    const supabase = createBrowserClient()
+    const supabase = createBrowserClient();
 
     const { data, error } = await supabase.auth.signUp({
       email: credentials.email,
@@ -55,7 +53,7 @@ export async function signUp(
         },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
-    })
+    });
 
     if (error) {
       return {
@@ -64,16 +62,16 @@ export async function signUp(
           message: error.message,
           code: error.status?.toString(),
         },
-      }
+      };
     }
 
     if (!data.user) {
       return {
         success: false,
         error: {
-          message: 'Failed to create user account',
+          message: "Failed to create user account",
         },
-      }
+      };
     }
 
     return {
@@ -83,14 +81,14 @@ export async function signUp(
         email: data.user.email || credentials.email,
         needsEmailVerification: !data.user.confirmed_at,
       },
-    }
+    };
   } catch (error) {
     return {
       success: false,
       error: {
-        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        message: error instanceof Error ? error.message : "An unexpected error occurred",
       },
-    }
+    };
   }
 }
 
@@ -99,28 +97,26 @@ export async function signUp(
 // =====================================================
 
 export interface SignInCredentials {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 export interface SignInData {
-  userId: string
-  email: string
+  userId: string;
+  email: string;
 }
 
 /**
  * Sign in an existing user with email and password
  */
-export async function signIn(
-  credentials: SignInCredentials
-): Promise<AuthResult<SignInData>> {
+export async function signIn(credentials: SignInCredentials): Promise<AuthResult<SignInData>> {
   try {
-    const supabase = createBrowserClient()
+    const supabase = createBrowserClient();
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email: credentials.email,
       password: credentials.password,
-    })
+    });
 
     if (error) {
       return {
@@ -129,16 +125,16 @@ export async function signIn(
           message: error.message,
           code: error.status?.toString(),
         },
-      }
+      };
     }
 
     if (!data.user) {
       return {
         success: false,
         error: {
-          message: 'Invalid email or password',
+          message: "Invalid email or password",
         },
-      }
+      };
     }
 
     return {
@@ -147,14 +143,14 @@ export async function signIn(
         userId: data.user.id,
         email: data.user.email || credentials.email,
       },
-    }
+    };
   } catch (error) {
     return {
       success: false,
       error: {
-        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        message: error instanceof Error ? error.message : "An unexpected error occurred",
       },
-    }
+    };
   }
 }
 
@@ -167,9 +163,9 @@ export async function signIn(
  */
 export async function signOut(): Promise<AuthResult> {
   try {
-    const supabase = createBrowserClient()
+    const supabase = createBrowserClient();
 
-    const { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut();
 
     if (error) {
       return {
@@ -177,19 +173,19 @@ export async function signOut(): Promise<AuthResult> {
         error: {
           message: error.message,
         },
-      }
+      };
     }
 
     return {
       success: true,
-    }
+    };
   } catch (error) {
     return {
       success: false,
       error: {
-        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        message: error instanceof Error ? error.message : "An unexpected error occurred",
       },
-    }
+    };
   }
 }
 
@@ -202,11 +198,11 @@ export async function signOut(): Promise<AuthResult> {
  */
 export async function sendPasswordResetEmail(email: string): Promise<AuthResult> {
   try {
-    const supabase = createBrowserClient()
+    const supabase = createBrowserClient();
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
-    })
+    });
 
     if (error) {
       return {
@@ -214,19 +210,19 @@ export async function sendPasswordResetEmail(email: string): Promise<AuthResult>
         error: {
           message: error.message,
         },
-      }
+      };
     }
 
     return {
       success: true,
-    }
+    };
   } catch (error) {
     return {
       success: false,
       error: {
-        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        message: error instanceof Error ? error.message : "An unexpected error occurred",
       },
-    }
+    };
   }
 }
 
@@ -235,11 +231,11 @@ export async function sendPasswordResetEmail(email: string): Promise<AuthResult>
  */
 export async function updatePassword(newPassword: string): Promise<AuthResult> {
   try {
-    const supabase = createBrowserClient()
+    const supabase = createBrowserClient();
 
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
-    })
+    });
 
     if (error) {
       return {
@@ -247,19 +243,19 @@ export async function updatePassword(newPassword: string): Promise<AuthResult> {
         error: {
           message: error.message,
         },
-      }
+      };
     }
 
     return {
       success: true,
-    }
+    };
   } catch (error) {
     return {
       success: false,
       error: {
-        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        message: error instanceof Error ? error.message : "An unexpected error occurred",
       },
-    }
+    };
   }
 }
 
@@ -271,22 +267,22 @@ export async function updatePassword(newPassword: string): Promise<AuthResult> {
  * Get current user (client-side)
  */
 export async function getCurrentUser() {
-  const supabase = createBrowserClient()
-  const { data, error } = await supabase.auth.getUser()
+  const supabase = createBrowserClient();
+  const { data, error } = await supabase.auth.getUser();
 
   if (error || !data.user) {
-    return null
+    return null;
   }
 
-  return data.user
+  return data.user;
 }
 
 /**
  * Check if user is authenticated (client-side)
  */
 export async function isAuthenticated(): Promise<boolean> {
-  const user = await getCurrentUser()
-  return !!user
+  const user = await getCurrentUser();
+  return !!user;
 }
 
 // =====================================================
@@ -297,41 +293,41 @@ export async function isAuthenticated(): Promise<boolean> {
  * Validate email format
  */
 export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
 /**
  * Validate password strength
  */
 export interface PasswordValidation {
-  isValid: boolean
-  errors: string[]
+  isValid: boolean;
+  errors: string[];
 }
 
 export function validatePassword(password: string): PasswordValidation {
-  const errors: string[] = []
+  const errors: string[] = [];
 
   if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long')
+    errors.push("Password must be at least 8 characters long");
   }
 
   if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter')
+    errors.push("Password must contain at least one uppercase letter");
   }
 
   if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter')
+    errors.push("Password must contain at least one lowercase letter");
   }
 
   if (!/[0-9]/.test(password)) {
-    errors.push('Password must contain at least one number')
+    errors.push("Password must contain at least one number");
   }
 
   return {
     isValid: errors.length === 0,
     errors,
-  }
+  };
 }
 
 // =====================================================
@@ -341,10 +337,8 @@ export function validatePassword(password: string): PasswordValidation {
 /**
  * Subscribe to auth state changes (client-side only)
  */
-export function onAuthStateChange(
-  callback: (event: string, session: any) => void
-) {
-  const supabase = createBrowserClient()
-  const { data } = supabase.auth.onAuthStateChange(callback)
-  return data.subscription
+export function onAuthStateChange(callback: (event: string, session: any) => void) {
+  const supabase = createBrowserClient();
+  const { data } = supabase.auth.onAuthStateChange(callback);
+  return data.subscription;
 }

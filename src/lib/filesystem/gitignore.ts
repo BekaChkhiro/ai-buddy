@@ -3,16 +3,16 @@
  * Parse and respect .gitignore rules when traversing directories
  */
 
-import path from 'path'
-import fs from 'fs/promises'
-import ignore, { Ignore } from 'ignore'
-import { validatePathOrThrow } from './validator'
-import { EXCLUDED_PATTERNS } from './constants'
+import path from "path";
+import fs from "fs/promises";
+import ignore, { Ignore } from "ignore";
+import { validatePathOrThrow } from "./validator";
+import { EXCLUDED_PATTERNS } from "./constants";
 
 /**
  * Cache for parsed .gitignore rules by project path
  */
-const gitignoreCache = new Map<string, Ignore>()
+const gitignoreCache = new Map<string, Ignore>();
 
 /**
  * Create an ignore instance with .gitignore rules for a project
@@ -23,30 +23,30 @@ const gitignoreCache = new Map<string, Ignore>()
 export async function createIgnoreInstance(projectPath: string): Promise<Ignore> {
   // Check cache first
   if (gitignoreCache.has(projectPath)) {
-    return gitignoreCache.get(projectPath)!
+    return gitignoreCache.get(projectPath)!;
   }
 
-  const ig = ignore()
+  const ig = ignore();
 
   // Add default excluded patterns
-  ig.add(EXCLUDED_PATTERNS)
+  ig.add(EXCLUDED_PATTERNS);
 
   // Try to read .gitignore file
   try {
-    const gitignorePath = await validatePathOrThrow(projectPath, '.gitignore')
-    const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8')
+    const gitignorePath = await validatePathOrThrow(projectPath, ".gitignore");
+    const gitignoreContent = await fs.readFile(gitignorePath, "utf-8");
 
     // Parse and add .gitignore rules
-    ig.add(gitignoreContent)
+    ig.add(gitignoreContent);
   } catch (error: any) {
     // .gitignore doesn't exist or can't be read - that's okay
     // We'll just use the default excluded patterns
   }
 
   // Cache the instance
-  gitignoreCache.set(projectPath, ig)
+  gitignoreCache.set(projectPath, ig);
 
-  return ig
+  return ig;
 }
 
 /**
@@ -56,17 +56,14 @@ export async function createIgnoreInstance(projectPath: string): Promise<Ignore>
  * @param targetPath - The path to check (relative to project root)
  * @returns true if path should be ignored
  */
-export async function shouldIgnore(
-  projectPath: string,
-  targetPath: string
-): Promise<boolean> {
-  const ig = await createIgnoreInstance(projectPath)
-  const relativePath = path.relative(projectPath, targetPath)
+export async function shouldIgnore(projectPath: string, targetPath: string): Promise<boolean> {
+  const ig = await createIgnoreInstance(projectPath);
+  const relativePath = path.relative(projectPath, targetPath);
 
   // ignore library expects forward slashes
-  const normalizedPath = relativePath.split(path.sep).join('/')
+  const normalizedPath = relativePath.split(path.sep).join("/");
 
-  return ig.ignores(normalizedPath)
+  return ig.ignores(normalizedPath);
 }
 
 /**
@@ -76,17 +73,14 @@ export async function shouldIgnore(
  * @param paths - Array of paths to filter
  * @returns Filtered array of paths that should not be ignored
  */
-export async function filterIgnored(
-  projectPath: string,
-  paths: string[]
-): Promise<string[]> {
-  const ig = await createIgnoreInstance(projectPath)
+export async function filterIgnored(projectPath: string, paths: string[]): Promise<string[]> {
+  const ig = await createIgnoreInstance(projectPath);
 
-  return paths.filter(filePath => {
-    const relativePath = path.relative(projectPath, filePath)
-    const normalizedPath = relativePath.split(path.sep).join('/')
-    return !ig.ignores(normalizedPath)
-  })
+  return paths.filter((filePath) => {
+    const relativePath = path.relative(projectPath, filePath);
+    const normalizedPath = relativePath.split(path.sep).join("/");
+    return !ig.ignores(normalizedPath);
+  });
 }
 
 /**
@@ -97,9 +91,9 @@ export async function filterIgnored(
  */
 export function clearGitignoreCache(projectPath?: string): void {
   if (projectPath) {
-    gitignoreCache.delete(projectPath)
+    gitignoreCache.delete(projectPath);
   } else {
-    gitignoreCache.clear()
+    gitignoreCache.clear();
   }
 }
 
@@ -111,24 +105,22 @@ export function clearGitignoreCache(projectPath?: string): void {
  * @returns true if path matches common ignore patterns
  */
 export function matchesCommonIgnorePatterns(filePath: string): boolean {
-  const fileName = path.basename(filePath)
-  const pathSegments = filePath.split(path.sep)
+  const fileName = path.basename(filePath);
+  const pathSegments = filePath.split(path.sep);
 
   const commonPatterns = [
-    'node_modules',
-    '.git',
-    '.next',
-    'dist',
-    'build',
-    'out',
-    '.cache',
-    '.DS_Store',
-    'Thumbs.db',
-  ]
+    "node_modules",
+    ".git",
+    ".next",
+    "dist",
+    "build",
+    "out",
+    ".cache",
+    ".DS_Store",
+    "Thumbs.db",
+  ];
 
-  return commonPatterns.some(pattern =>
-    pathSegments.includes(pattern) || fileName === pattern
-  )
+  return commonPatterns.some((pattern) => pathSegments.includes(pattern) || fileName === pattern);
 }
 
 /**
@@ -139,7 +131,7 @@ export function matchesCommonIgnorePatterns(filePath: string): boolean {
  */
 export function parseGitignorePatterns(gitignoreContent: string): string[] {
   return gitignoreContent
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line && !line.startsWith('#'))
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("#"));
 }

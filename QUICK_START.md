@@ -26,6 +26,7 @@ nano .env.local
 ```
 
 **Minimum required values:**
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key_here
@@ -76,12 +77,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
-export function Button({
-  variant = "primary",
-  className,
-  children,
-  ...props
-}: ButtonProps) {
+export function Button({ variant = "primary", className, children, ...props }: ButtonProps) {
   return (
     <button
       className={cn(
@@ -181,12 +177,14 @@ If using VS Code, install recommended extensions:
 ## Troubleshooting
 
 ### Port 3000 already in use?
+
 ```bash
 # Use a different port
 npm run dev -- -p 3001
 ```
 
 ### Module not found errors?
+
 ```bash
 # Reinstall dependencies
 npm run clean
@@ -194,6 +192,7 @@ npm install
 ```
 
 ### TypeScript errors?
+
 ```bash
 # Check your tsconfig.json and run
 npm run type-check

@@ -3,58 +3,58 @@
  * Local folder selection with validation
  */
 
-'use client'
+"use client";
 
-import { useState, useRef } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Folder, Check, AlertCircle } from 'lucide-react'
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Folder, Check, AlertCircle } from "lucide-react";
 
 interface FolderPickerProps {
-  value: string
-  onChange: (path: string) => void
-  disabled?: boolean
+  value: string;
+  onChange: (path: string) => void;
+  disabled?: boolean;
 }
 
 export function FolderPicker({ value, onChange, disabled }: FolderPickerProps) {
-  const [isValidating, setIsValidating] = useState(false)
-  const [validationStatus, setValidationStatus] = useState<'valid' | 'invalid' | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationStatus, setValidationStatus] = useState<"valid" | "invalid" | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const validatePath = async (path: string) => {
     if (!path.trim()) {
-      setValidationStatus(null)
-      return
+      setValidationStatus(null);
+      return;
     }
 
-    setIsValidating(true)
+    setIsValidating(true);
     try {
       // In a real implementation, you would validate the path
       // For now, we'll just do basic validation
-      const isValid = path.length > 0 && (
-        path.startsWith('/') || // Unix path
-        /^[a-zA-Z]:\\/.test(path) // Windows path
-      )
+      const isValid =
+        path.length > 0 &&
+        (path.startsWith("/") || // Unix path
+          /^[a-zA-Z]:\\/.test(path)); // Windows path
 
-      setValidationStatus(isValid ? 'valid' : 'invalid')
+      setValidationStatus(isValid ? "valid" : "invalid");
     } catch (error) {
-      setValidationStatus('invalid')
+      setValidationStatus("invalid");
     } finally {
-      setIsValidating(false)
+      setIsValidating(false);
     }
-  }
+  };
 
   const handlePathChange = (newPath: string) => {
-    onChange(newPath)
-    validatePath(newPath)
-  }
+    onChange(newPath);
+    validatePath(newPath);
+  };
 
   const handleBrowse = () => {
     // In a real implementation with Electron or Tauri,
     // you would open a native folder picker dialog
     // For web, we'll just focus the input
-    inputRef.current?.focus()
-  }
+    inputRef.current?.focus();
+  };
 
   return (
     <div className="space-y-2">
@@ -68,16 +68,16 @@ export function FolderPicker({ value, onChange, disabled }: FolderPickerProps) {
             placeholder="/path/to/project or C:\path\to\project"
             disabled={disabled || isValidating}
             className={
-              validationStatus === 'valid'
-                ? 'pr-8 border-green-500'
-                : validationStatus === 'invalid'
-                ? 'pr-8 border-destructive'
-                : ''
+              validationStatus === "valid"
+                ? "pr-8 border-green-500"
+                : validationStatus === "invalid"
+                  ? "pr-8 border-destructive"
+                  : ""
             }
           />
           {validationStatus && (
             <div className="absolute right-2 top-1/2 -translate-y-1/2">
-              {validationStatus === 'valid' ? (
+              {validationStatus === "valid" ? (
                 <Check className="h-4 w-4 text-green-500" />
               ) : (
                 <AlertCircle className="h-4 w-4 text-destructive" />
@@ -95,11 +95,9 @@ export function FolderPicker({ value, onChange, disabled }: FolderPickerProps) {
           Browse
         </Button>
       </div>
-      {validationStatus === 'invalid' && (
-        <p className="text-xs text-destructive">
-          Please enter a valid folder path
-        </p>
+      {validationStatus === "invalid" && (
+        <p className="text-xs text-destructive">Please enter a valid folder path</p>
       )}
     </div>
-  )
+  );
 }
