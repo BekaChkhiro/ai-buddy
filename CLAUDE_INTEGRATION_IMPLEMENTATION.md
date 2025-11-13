@@ -137,8 +137,8 @@ ANTHROPIC_API_KEY=sk-ant-api03-...
 ### Models Available
 
 ```typescript
-'claude-3-5-sonnet-20241022'  // Default - Balanced performance
-'claude-3-5-haiku-20241022'   // Fast and cheap
+'claude-3-5-sonnet-20240620'  // Default - Balanced performance
+'claude-3-haiku-20240307'     // Fast and cheap
 'claude-3-opus-20240229'      // Premium quality
 ```
 
@@ -147,7 +147,7 @@ ANTHROPIC_API_KEY=sk-ant-api03-...
 | Model | Input | Output |
 |-------|-------|--------|
 | Sonnet 3.5 | $3.00 | $15.00 |
-| Haiku 3.5 | $0.80 | $4.00 |
+| Haiku 3 | $0.25 | $1.25 |
 | Opus 3 | $15.00 | $75.00 |
 
 ### Limits and Configuration

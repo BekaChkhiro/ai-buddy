@@ -10,7 +10,15 @@
       "Bash(npm run type-check:*)",
       "Bash(test:*)",
       "Bash(npm run build:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git push:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(if [ -f .env.local ])",
+      "Bash(then grep -q \"ANTHROPIC_API_KEY\" .env.local)",
+      "Bash(else echo \"❌ .env.local file not found\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []
