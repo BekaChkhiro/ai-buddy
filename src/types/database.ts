@@ -129,39 +129,63 @@ export interface Database {
           project_id: string;
           title: string;
           description: string | null;
-          status: "pending" | "in_progress" | "completed" | "failed" | "blocked";
+          status: "pending" | "in_progress" | "implementing" | "completed" | "failed" | "blocked";
           priority: "low" | "medium" | "high" | "urgent";
           implementation_details: Json | null;
           created_at: string;
           updated_at: string;
           implemented_at: string | null;
           implementation_log: string | null;
+          due_date: string | null;
+          assignee_id: string | null;
+          labels: string[];
+          estimated_hours: number | null;
+          actual_hours: number | null;
+          started_at: string | null;
+          completed_at: string | null;
+          sort_order: number;
         };
         Insert: {
           id?: string;
           project_id: string;
           title: string;
           description?: string | null;
-          status?: "pending" | "in_progress" | "completed" | "failed" | "blocked";
+          status?: "pending" | "in_progress" | "implementing" | "completed" | "failed" | "blocked";
           priority?: "low" | "medium" | "high" | "urgent";
           implementation_details?: Json | null;
           created_at?: string;
           updated_at?: string;
           implemented_at?: string | null;
           implementation_log?: string | null;
+          due_date?: string | null;
+          assignee_id?: string | null;
+          labels?: string[];
+          estimated_hours?: number | null;
+          actual_hours?: number | null;
+          started_at?: string | null;
+          completed_at?: string | null;
+          sort_order?: number;
         };
         Update: {
           id?: string;
           project_id?: string;
           title?: string;
           description?: string | null;
-          status?: "pending" | "in_progress" | "completed" | "failed" | "blocked";
+          status?: "pending" | "in_progress" | "implementing" | "completed" | "failed" | "blocked";
           priority?: "low" | "medium" | "high" | "urgent";
           implementation_details?: Json | null;
           created_at?: string;
           updated_at?: string;
           implemented_at?: string | null;
           implementation_log?: string | null;
+          due_date?: string | null;
+          assignee_id?: string | null;
+          labels?: string[];
+          estimated_hours?: number | null;
+          actual_hours?: number | null;
+          started_at?: string | null;
+          completed_at?: string | null;
+          sort_order?: number;
         };
         Relationships: [
           {
@@ -169,6 +193,13 @@ export interface Database {
             columns: ["project_id"];
             isOneToOne: false;
             referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tasks_assignee_id_fkey";
+            columns: ["assignee_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -265,6 +296,135 @@ export interface Database {
             columns: ["project_id"];
             isOneToOne: false;
             referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      task_dependencies: {
+        Row: {
+          id: string;
+          task_id: string;
+          depends_on_task_id: string;
+          dependency_type: "blocks" | "relates_to";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          task_id: string;
+          depends_on_task_id: string;
+          dependency_type?: "blocks" | "relates_to";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          task_id?: string;
+          depends_on_task_id?: string;
+          dependency_type?: "blocks" | "relates_to";
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "task_dependencies_task_id_fkey";
+            columns: ["task_id"];
+            isOneToOne: false;
+            referencedRelation: "tasks";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "task_dependencies_depends_on_task_id_fkey";
+            columns: ["depends_on_task_id"];
+            isOneToOne: false;
+            referencedRelation: "tasks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      task_comments: {
+        Row: {
+          id: string;
+          task_id: string;
+          user_id: string;
+          content: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          task_id: string;
+          user_id: string;
+          content: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          task_id?: string;
+          user_id?: string;
+          content?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "task_comments_task_id_fkey";
+            columns: ["task_id"];
+            isOneToOne: false;
+            referencedRelation: "tasks";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "task_comments_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      task_history: {
+        Row: {
+          id: string;
+          task_id: string;
+          user_id: string;
+          action: string;
+          field_name: string | null;
+          old_value: string | null;
+          new_value: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          task_id: string;
+          user_id: string;
+          action: string;
+          field_name?: string | null;
+          old_value?: string | null;
+          new_value?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          task_id?: string;
+          user_id?: string;
+          action?: string;
+          field_name?: string | null;
+          old_value?: string | null;
+          new_value?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "task_history_task_id_fkey";
+            columns: ["task_id"];
+            isOneToOne: false;
+            referencedRelation: "tasks";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "task_history_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
