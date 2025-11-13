@@ -3,118 +3,118 @@
  * Single project operations
  */
 
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback } from 'react'
-import { Project, ApiResponse, UpdateProjectForm } from '@/types'
+import { useState, useEffect, useCallback } from "react";
+import { Project, ApiResponse, UpdateProjectForm } from "@/types";
 
 interface UseProjectOptions {
-  projectId: string
-  autoFetch?: boolean
+  projectId: string;
+  autoFetch?: boolean;
 }
 
 interface UseProjectReturn {
-  project: Project | null
-  isLoading: boolean
-  error: string | null
-  refetch: () => Promise<void>
-  updateProject: (data: UpdateProjectForm) => Promise<Project | null>
-  deleteProject: () => Promise<boolean>
+  project: Project | null;
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+  updateProject: (data: UpdateProjectForm) => Promise<Project | null>;
+  deleteProject: () => Promise<boolean>;
 }
 
 export function useProject(options: UseProjectOptions): UseProjectReturn {
-  const { projectId, autoFetch = true } = options
+  const { projectId, autoFetch = true } = options;
 
-  const [project, setProject] = useState<Project | null>(null)
-  const [isLoading, setIsLoading] = useState(autoFetch)
-  const [error, setError] = useState<string | null>(null)
+  const [project, setProject] = useState<Project | null>(null);
+  const [isLoading, setIsLoading] = useState(autoFetch);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchProject = useCallback(async () => {
-    if (!projectId) return
+    if (!projectId) return;
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
     try {
-      const response = await fetch(`/api/projects/${projectId}`)
-      const result: ApiResponse<Project> = await response.json()
+      const response = await fetch(`/api/projects/${projectId}`);
+      const result: ApiResponse<Project> = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error?.message || 'Failed to fetch project')
+        throw new Error(result.error?.message || "Failed to fetch project");
       }
 
-      setProject(result.data || null)
+      setProject(result.data || null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch project'
-      setError(message)
-      console.error('Error fetching project:', err)
+      const message = err instanceof Error ? err.message : "Failed to fetch project";
+      setError(message);
+      console.error("Error fetching project:", err);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [projectId])
+  }, [projectId]);
 
   const updateProject = useCallback(
     async (data: UpdateProjectForm): Promise<Project | null> => {
-      if (!projectId) return null
+      if (!projectId) return null;
 
       try {
         const response = await fetch(`/api/projects/${projectId}`, {
-          method: 'PATCH',
+          method: "PATCH",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
-        })
+        });
 
-        const result: ApiResponse<Project> = await response.json()
+        const result: ApiResponse<Project> = await response.json();
 
         if (!response.ok || !result.success) {
-          throw new Error(result.error?.message || 'Failed to update project')
+          throw new Error(result.error?.message || "Failed to update project");
         }
 
         // Update local state
         if (result.data) {
-          setProject(result.data)
+          setProject(result.data);
         }
 
-        return result.data || null
+        return result.data || null;
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to update project'
-        setError(message)
-        console.error('Error updating project:', err)
-        return null
+        const message = err instanceof Error ? err.message : "Failed to update project";
+        setError(message);
+        console.error("Error updating project:", err);
+        return null;
       }
     },
     [projectId]
-  )
+  );
 
   const deleteProject = useCallback(async (): Promise<boolean> => {
-    if (!projectId) return false
+    if (!projectId) return false;
 
     try {
       const response = await fetch(`/api/projects/${projectId}`, {
-        method: 'DELETE',
-      })
+        method: "DELETE",
+      });
 
-      const result: ApiResponse<{ id: string }> = await response.json()
+      const result: ApiResponse<{ id: string }> = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error?.message || 'Failed to delete project')
+        throw new Error(result.error?.message || "Failed to delete project");
       }
 
-      return true
+      return true;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete project'
-      setError(message)
-      console.error('Error deleting project:', err)
-      return false
+      const message = err instanceof Error ? err.message : "Failed to delete project";
+      setError(message);
+      console.error("Error deleting project:", err);
+      return false;
     }
-  }, [projectId])
+  }, [projectId]);
 
   useEffect(() => {
     if (autoFetch && projectId) {
-      fetchProject()
+      fetchProject();
     }
-  }, [autoFetch, projectId, fetchProject])
+  }, [autoFetch, projectId, fetchProject]);
 
   return {
     project,
@@ -123,5 +123,5 @@ export function useProject(options: UseProjectOptions): UseProjectReturn {
     refetch: fetchProject,
     updateProject,
     deleteProject,
-  }
+  };
 }

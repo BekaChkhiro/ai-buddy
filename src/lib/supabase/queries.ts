@@ -3,8 +3,8 @@
  * Common database operations for all tables
  */
 
-import { SupabaseClient } from '@supabase/supabase-js'
-import { Database } from '@/types/database'
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "@/types/database";
 import {
   Profile,
   Project,
@@ -26,9 +26,9 @@ import {
   toTask,
   toTaskExecution,
   TaskStatus,
-} from '@/types'
+} from "@/types";
 
-type TypedSupabaseClient = SupabaseClient<Database>
+type TypedSupabaseClient = SupabaseClient<Database>;
 
 // =====================================================
 // PROFILE QUERIES
@@ -37,16 +37,11 @@ type TypedSupabaseClient = SupabaseClient<Database>
 /**
  * Get the current user's profile
  */
-export async function getCurrentProfile(
-  supabase: TypedSupabaseClient
-): Promise<Profile | null> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .single()
+export async function getCurrentProfile(supabase: TypedSupabaseClient): Promise<Profile | null> {
+  const { data, error } = await supabase.from("profiles").select("*").single();
 
-  if (error || !data) return null
-  return toProfile(data)
+  if (error || !data) return null;
+  return toProfile(data);
 }
 
 /**
@@ -56,14 +51,10 @@ export async function getProfileById(
   supabase: TypedSupabaseClient,
   userId: string
 ): Promise<Profile | null> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single()
+  const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single();
 
-  if (error || !data) return null
-  return toProfile(data)
+  if (error || !data) return null;
+  return toProfile(data);
 }
 
 /**
@@ -73,18 +64,18 @@ export async function updateProfile(
   supabase: TypedSupabaseClient,
   updates: { full_name?: string; avatar_url?: string }
 ): Promise<Profile | null> {
-  const user = await supabase.auth.getUser()
-  if (!user.data.user) return null
+  const user = await supabase.auth.getUser();
+  if (!user.data.user) return null;
 
   const { data, error } = await supabase
-    .from('profiles')
+    .from("profiles")
     .update(updates)
-    .eq('id', user.data.user.id)
+    .eq("id", user.data.user.id)
     .select()
-    .single()
+    .single();
 
-  if (error || !data) return null
-  return toProfile(data)
+  if (error || !data) return null;
+  return toProfile(data);
 }
 
 // =====================================================
@@ -98,18 +89,18 @@ export async function getProjects(
   supabase: TypedSupabaseClient,
   options?: { sort?: SortOptions }
 ): Promise<Project[]> {
-  let query = supabase.from('projects').select('*')
+  let query = supabase.from("projects").select("*");
 
   if (options?.sort) {
-    query = query.order(options.sort.field, { ascending: options.sort.direction === 'asc' })
+    query = query.order(options.sort.field, { ascending: options.sort.direction === "asc" });
   } else {
-    query = query.order('created_at', { ascending: false })
+    query = query.order("created_at", { ascending: false });
   }
 
-  const { data, error } = await query
+  const { data, error } = await query;
 
-  if (error || !data) return []
-  return data.map(toProject)
+  if (error || !data) return [];
+  return data.map(toProject);
 }
 
 /**
@@ -119,14 +110,10 @@ export async function getProjectById(
   supabase: TypedSupabaseClient,
   projectId: string
 ): Promise<Project | null> {
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('id', projectId)
-    .single()
+  const { data, error } = await supabase.from("projects").select("*").eq("id", projectId).single();
 
-  if (error || !data) return null
-  return toProject(data)
+  if (error || !data) return null;
+  return toProject(data);
 }
 
 /**
@@ -134,19 +121,19 @@ export async function getProjectById(
  */
 export async function createProject(
   supabase: TypedSupabaseClient,
-  project: Omit<ProjectInsert, 'user_id'>
+  project: Omit<ProjectInsert, "user_id">
 ): Promise<Project | null> {
-  const user = await supabase.auth.getUser()
-  if (!user.data.user) return null
+  const user = await supabase.auth.getUser();
+  if (!user.data.user) return null;
 
   const { data, error } = await supabase
-    .from('projects')
+    .from("projects")
     .insert({ ...project, user_id: user.data.user.id })
     .select()
-    .single()
+    .single();
 
-  if (error || !data) return null
-  return toProject(data)
+  if (error || !data) return null;
+  return toProject(data);
 }
 
 /**
@@ -158,14 +145,14 @@ export async function updateProject(
   updates: ProjectUpdate
 ): Promise<Project | null> {
   const { data, error } = await supabase
-    .from('projects')
+    .from("projects")
     .update(updates)
-    .eq('id', projectId)
+    .eq("id", projectId)
     .select()
-    .single()
+    .single();
 
-  if (error || !data) return null
-  return toProject(data)
+  if (error || !data) return null;
+  return toProject(data);
 }
 
 /**
@@ -175,12 +162,9 @@ export async function deleteProject(
   supabase: TypedSupabaseClient,
   projectId: string
 ): Promise<boolean> {
-  const { error } = await supabase
-    .from('projects')
-    .delete()
-    .eq('id', projectId)
+  const { error } = await supabase.from("projects").delete().eq("id", projectId);
 
-  return !error
+  return !error;
 }
 
 /**
@@ -190,35 +174,35 @@ export async function getProjectsWithStats(
   supabase: TypedSupabaseClient
 ): Promise<Array<Project & { taskCount: number; completedTaskCount: number }>> {
   const { data: projects, error: projectsError } = await supabase
-    .from('projects')
-    .select('*')
-    .order('created_at', { ascending: false })
+    .from("projects")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-  if (projectsError || !projects) return []
+  if (projectsError || !projects) return [];
 
   // Get task counts for each project
   const projectsWithStats = await Promise.all(
     projects.map(async (project) => {
       const { count: totalCount } = await supabase
-        .from('tasks')
-        .select('*', { count: 'exact', head: true })
-        .eq('project_id', project.id)
+        .from("tasks")
+        .select("*", { count: "exact", head: true })
+        .eq("project_id", project.id);
 
       const { count: completedCount } = await supabase
-        .from('tasks')
-        .select('*', { count: 'exact', head: true })
-        .eq('project_id', project.id)
-        .eq('status', 'completed')
+        .from("tasks")
+        .select("*", { count: "exact", head: true })
+        .eq("project_id", project.id)
+        .eq("status", "completed");
 
       return {
         ...toProject(project),
         taskCount: totalCount || 0,
         completedTaskCount: completedCount || 0,
-      }
+      };
     })
-  )
+  );
 
-  return projectsWithStats
+  return projectsWithStats;
 }
 
 // =====================================================
@@ -234,19 +218,19 @@ export async function getProjectMessages(
   limit?: number
 ): Promise<ChatMessage[]> {
   let query = supabase
-    .from('chat_messages')
-    .select('*')
-    .eq('project_id', projectId)
-    .order('created_at', { ascending: true })
+    .from("chat_messages")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: true });
 
   if (limit) {
-    query = query.limit(limit)
+    query = query.limit(limit);
   }
 
-  const { data, error } = await query
+  const { data, error } = await query;
 
-  if (error || !data) return []
-  return data.map(toChatMessage)
+  if (error || !data) return [];
+  return data.map(toChatMessage);
 }
 
 /**
@@ -254,19 +238,19 @@ export async function getProjectMessages(
  */
 export async function createChatMessage(
   supabase: TypedSupabaseClient,
-  message: Omit<ChatMessageInsert, 'user_id'>
+  message: Omit<ChatMessageInsert, "user_id">
 ): Promise<ChatMessage | null> {
-  const user = await supabase.auth.getUser()
-  if (!user.data.user) return null
+  const user = await supabase.auth.getUser();
+  if (!user.data.user) return null;
 
   const { data, error } = await supabase
-    .from('chat_messages')
+    .from("chat_messages")
     .insert({ ...message, user_id: user.data.user.id })
     .select()
-    .single()
+    .single();
 
-  if (error || !data) return null
-  return toChatMessage(data)
+  if (error || !data) return null;
+  return toChatMessage(data);
 }
 
 /**
@@ -276,12 +260,9 @@ export async function deleteChatMessage(
   supabase: TypedSupabaseClient,
   messageId: string
 ): Promise<boolean> {
-  const { error } = await supabase
-    .from('chat_messages')
-    .delete()
-    .eq('id', messageId)
+  const { error } = await supabase.from("chat_messages").delete().eq("id", messageId);
 
-  return !error
+  return !error;
 }
 
 /**
@@ -291,12 +272,9 @@ export async function deleteProjectMessages(
   supabase: TypedSupabaseClient,
   projectId: string
 ): Promise<boolean> {
-  const { error } = await supabase
-    .from('chat_messages')
-    .delete()
-    .eq('project_id', projectId)
+  const { error } = await supabase.from("chat_messages").delete().eq("project_id", projectId);
 
-  return !error
+  return !error;
 }
 
 // =====================================================
@@ -312,43 +290,40 @@ export async function getProjectTasks(
   filters?: TaskFilters,
   sort?: SortOptions
 ): Promise<Task[]> {
-  let query = supabase
-    .from('tasks')
-    .select('*')
-    .eq('project_id', projectId)
+  let query = supabase.from("tasks").select("*").eq("project_id", projectId);
 
   // Apply filters
   if (filters?.status) {
     if (Array.isArray(filters.status)) {
-      query = query.in('status', filters.status)
+      query = query.in("status", filters.status);
     } else {
-      query = query.eq('status', filters.status)
+      query = query.eq("status", filters.status);
     }
   }
 
   if (filters?.priority) {
     if (Array.isArray(filters.priority)) {
-      query = query.in('priority', filters.priority)
+      query = query.in("priority", filters.priority);
     } else {
-      query = query.eq('priority', filters.priority)
+      query = query.eq("priority", filters.priority);
     }
   }
 
   if (filters?.search) {
-    query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
+    query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
   }
 
   // Apply sorting
   if (sort) {
-    query = query.order(sort.field, { ascending: sort.direction === 'asc' })
+    query = query.order(sort.field, { ascending: sort.direction === "asc" });
   } else {
-    query = query.order('created_at', { ascending: false })
+    query = query.order("created_at", { ascending: false });
   }
 
-  const { data, error } = await query
+  const { data, error } = await query;
 
-  if (error || !data) return []
-  return data.map(toTask)
+  if (error || !data) return [];
+  return data.map(toTask);
 }
 
 /**
@@ -358,14 +333,10 @@ export async function getTaskById(
   supabase: TypedSupabaseClient,
   taskId: string
 ): Promise<Task | null> {
-  const { data, error } = await supabase
-    .from('tasks')
-    .select('*')
-    .eq('id', taskId)
-    .single()
+  const { data, error } = await supabase.from("tasks").select("*").eq("id", taskId).single();
 
-  if (error || !data) return null
-  return toTask(data)
+  if (error || !data) return null;
+  return toTask(data);
 }
 
 /**
@@ -375,14 +346,10 @@ export async function createTask(
   supabase: TypedSupabaseClient,
   task: TaskInsert
 ): Promise<Task | null> {
-  const { data, error } = await supabase
-    .from('tasks')
-    .insert(task)
-    .select()
-    .single()
+  const { data, error } = await supabase.from("tasks").insert(task).select().single();
 
-  if (error || !data) return null
-  return toTask(data)
+  if (error || !data) return null;
+  return toTask(data);
 }
 
 /**
@@ -394,29 +361,23 @@ export async function updateTask(
   updates: TaskUpdate
 ): Promise<Task | null> {
   const { data, error } = await supabase
-    .from('tasks')
+    .from("tasks")
     .update(updates)
-    .eq('id', taskId)
+    .eq("id", taskId)
     .select()
-    .single()
+    .single();
 
-  if (error || !data) return null
-  return toTask(data)
+  if (error || !data) return null;
+  return toTask(data);
 }
 
 /**
  * Delete a task
  */
-export async function deleteTask(
-  supabase: TypedSupabaseClient,
-  taskId: string
-): Promise<boolean> {
-  const { error } = await supabase
-    .from('tasks')
-    .delete()
-    .eq('id', taskId)
+export async function deleteTask(supabase: TypedSupabaseClient, taskId: string): Promise<boolean> {
+  const { error } = await supabase.from("tasks").delete().eq("id", taskId);
 
-  return !error
+  return !error;
 }
 
 /**
@@ -427,13 +388,13 @@ export async function updateTaskStatus(
   taskId: string,
   status: TaskStatus
 ): Promise<Task | null> {
-  const updates: TaskUpdate = { status }
+  const updates: TaskUpdate = { status };
 
   if (status === TaskStatus.COMPLETED) {
-    updates.implemented_at = new Date().toISOString()
+    updates.implemented_at = new Date().toISOString();
   }
 
-  return updateTask(supabase, taskId, updates)
+  return updateTask(supabase, taskId, updates);
 }
 
 /**
@@ -444,7 +405,7 @@ export async function getTasksByStatus(
   projectId: string,
   status: TaskStatus
 ): Promise<Task[]> {
-  return getProjectTasks(supabase, projectId, { status })
+  return getProjectTasks(supabase, projectId, { status });
 }
 
 /**
@@ -454,7 +415,7 @@ export async function getPendingTasks(
   supabase: TypedSupabaseClient,
   projectId: string
 ): Promise<Task[]> {
-  return getTasksByStatus(supabase, projectId, TaskStatus.PENDING)
+  return getTasksByStatus(supabase, projectId, TaskStatus.PENDING);
 }
 
 /**
@@ -464,7 +425,7 @@ export async function getCompletedTasks(
   supabase: TypedSupabaseClient,
   projectId: string
 ): Promise<Task[]> {
-  return getTasksByStatus(supabase, projectId, TaskStatus.COMPLETED)
+  return getTasksByStatus(supabase, projectId, TaskStatus.COMPLETED);
 }
 
 // =====================================================
@@ -479,13 +440,13 @@ export async function getTaskExecutions(
   taskId: string
 ): Promise<TaskExecution[]> {
   const { data, error } = await supabase
-    .from('task_executions')
-    .select('*')
-    .eq('task_id', taskId)
-    .order('executed_at', { ascending: false })
+    .from("task_executions")
+    .select("*")
+    .eq("task_id", taskId)
+    .order("executed_at", { ascending: false });
 
-  if (error || !data) return []
-  return data.map(toTaskExecution)
+  if (error || !data) return [];
+  return data.map(toTaskExecution);
 }
 
 /**
@@ -496,13 +457,13 @@ export async function getTaskExecutionById(
   executionId: string
 ): Promise<TaskExecution | null> {
   const { data, error } = await supabase
-    .from('task_executions')
-    .select('*')
-    .eq('id', executionId)
-    .single()
+    .from("task_executions")
+    .select("*")
+    .eq("id", executionId)
+    .single();
 
-  if (error || !data) return null
-  return toTaskExecution(data)
+  if (error || !data) return null;
+  return toTaskExecution(data);
 }
 
 /**
@@ -510,19 +471,19 @@ export async function getTaskExecutionById(
  */
 export async function createTaskExecution(
   supabase: TypedSupabaseClient,
-  execution: Omit<TaskExecutionInsert, 'executed_by'>
+  execution: Omit<TaskExecutionInsert, "executed_by">
 ): Promise<TaskExecution | null> {
-  const user = await supabase.auth.getUser()
-  if (!user.data.user) return null
+  const user = await supabase.auth.getUser();
+  if (!user.data.user) return null;
 
   const { data, error } = await supabase
-    .from('task_executions')
+    .from("task_executions")
     .insert({ ...execution, executed_by: user.data.user.id })
     .select()
-    .single()
+    .single();
 
-  if (error || !data) return null
-  return toTaskExecution(data)
+  if (error || !data) return null;
+  return toTaskExecution(data);
 }
 
 /**
@@ -534,14 +495,14 @@ export async function updateTaskExecution(
   updates: TaskExecutionUpdate
 ): Promise<TaskExecution | null> {
   const { data, error } = await supabase
-    .from('task_executions')
+    .from("task_executions")
     .update(updates)
-    .eq('id', executionId)
+    .eq("id", executionId)
     .select()
-    .single()
+    .single();
 
-  if (error || !data) return null
-  return toTaskExecution(data)
+  if (error || !data) return null;
+  return toTaskExecution(data);
 }
 
 /**
@@ -551,12 +512,9 @@ export async function deleteTaskExecution(
   supabase: TypedSupabaseClient,
   executionId: string
 ): Promise<boolean> {
-  const { error } = await supabase
-    .from('task_executions')
-    .delete()
-    .eq('id', executionId)
+  const { error } = await supabase.from("task_executions").delete().eq("id", executionId);
 
-  return !error
+  return !error;
 }
 
 /**
@@ -567,15 +525,15 @@ export async function getLatestTaskExecution(
   taskId: string
 ): Promise<TaskExecution | null> {
   const { data, error } = await supabase
-    .from('task_executions')
-    .select('*')
-    .eq('task_id', taskId)
-    .order('executed_at', { ascending: false })
+    .from("task_executions")
+    .select("*")
+    .eq("task_id", taskId)
+    .order("executed_at", { ascending: false })
     .limit(1)
-    .single()
+    .single();
 
-  if (error || !data) return null
-  return toTaskExecution(data)
+  if (error || !data) return null;
+  return toTaskExecution(data);
 }
 
 // =====================================================
@@ -589,13 +547,10 @@ export async function createTasksBatch(
   supabase: TypedSupabaseClient,
   tasks: TaskInsert[]
 ): Promise<Task[]> {
-  const { data, error } = await supabase
-    .from('tasks')
-    .insert(tasks)
-    .select()
+  const { data, error } = await supabase.from("tasks").insert(tasks).select();
 
-  if (error || !data) return []
-  return data.map(toTask)
+  if (error || !data) return [];
+  return data.map(toTask);
 }
 
 /**
@@ -606,14 +561,10 @@ export async function updateTasksBatch(
   taskIds: string[],
   updates: TaskUpdate
 ): Promise<Task[]> {
-  const { data, error } = await supabase
-    .from('tasks')
-    .update(updates)
-    .in('id', taskIds)
-    .select()
+  const { data, error } = await supabase.from("tasks").update(updates).in("id", taskIds).select();
 
-  if (error || !data) return []
-  return data.map(toTask)
+  if (error || !data) return [];
+  return data.map(toTask);
 }
 
 /**
@@ -623,12 +574,9 @@ export async function deleteTasksBatch(
   supabase: TypedSupabaseClient,
   taskIds: string[]
 ): Promise<boolean> {
-  const { error } = await supabase
-    .from('tasks')
-    .delete()
-    .in('id', taskIds)
+  const { error } = await supabase.from("tasks").delete().in("id", taskIds);
 
-  return !error
+  return !error;
 }
 
 // =====================================================
@@ -642,17 +590,14 @@ export async function getProjectTaskStats(
   supabase: TypedSupabaseClient,
   projectId: string
 ): Promise<{
-  total: number
-  pending: number
-  inProgress: number
-  completed: number
-  failed: number
-  blocked: number
+  total: number;
+  pending: number;
+  inProgress: number;
+  completed: number;
+  failed: number;
+  blocked: number;
 }> {
-  const { data, error } = await supabase
-    .from('tasks')
-    .select('status')
-    .eq('project_id', projectId)
+  const { data, error } = await supabase.from("tasks").select("status").eq("project_id", projectId);
 
   if (error || !data) {
     return {
@@ -662,7 +607,7 @@ export async function getProjectTaskStats(
       completed: 0,
       failed: 0,
       blocked: 0,
-    }
+    };
   }
 
   const stats = {
@@ -672,41 +617,39 @@ export async function getProjectTaskStats(
     completed: data.filter((t) => t.status === TaskStatus.COMPLETED).length,
     failed: data.filter((t) => t.status === TaskStatus.FAILED).length,
     blocked: data.filter((t) => t.status === TaskStatus.BLOCKED).length,
-  }
+  };
 
-  return stats
+  return stats;
 }
 
 /**
  * Get overall user statistics
  */
-export async function getUserStats(
-  supabase: TypedSupabaseClient
-): Promise<{
-  projectCount: number
-  totalTasks: number
-  completedTasks: number
-  pendingTasks: number
+export async function getUserStats(supabase: TypedSupabaseClient): Promise<{
+  projectCount: number;
+  totalTasks: number;
+  completedTasks: number;
+  pendingTasks: number;
 }> {
-  const user = await supabase.auth.getUser()
+  const user = await supabase.auth.getUser();
   if (!user.data.user) {
     return {
       projectCount: 0,
       totalTasks: 0,
       completedTasks: 0,
       pendingTasks: 0,
-    }
+    };
   }
 
   const { count: projectCount } = await supabase
-    .from('projects')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.data.user.id)
+    .from("projects")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.data.user.id);
 
   const { data: projects } = await supabase
-    .from('projects')
-    .select('id')
-    .eq('user_id', user.data.user.id)
+    .from("projects")
+    .select("id")
+    .eq("user_id", user.data.user.id);
 
   if (!projects) {
     return {
@@ -714,32 +657,32 @@ export async function getUserStats(
       totalTasks: 0,
       completedTasks: 0,
       pendingTasks: 0,
-    }
+    };
   }
 
-  const projectIds = projects.map((p) => p.id)
+  const projectIds = projects.map((p) => p.id);
 
   const { count: totalTasks } = await supabase
-    .from('tasks')
-    .select('*', { count: 'exact', head: true })
-    .in('project_id', projectIds)
+    .from("tasks")
+    .select("*", { count: "exact", head: true })
+    .in("project_id", projectIds);
 
   const { count: completedTasks } = await supabase
-    .from('tasks')
-    .select('*', { count: 'exact', head: true })
-    .in('project_id', projectIds)
-    .eq('status', TaskStatus.COMPLETED)
+    .from("tasks")
+    .select("*", { count: "exact", head: true })
+    .in("project_id", projectIds)
+    .eq("status", TaskStatus.COMPLETED);
 
   const { count: pendingTasks } = await supabase
-    .from('tasks')
-    .select('*', { count: 'exact', head: true })
-    .in('project_id', projectIds)
-    .eq('status', TaskStatus.PENDING)
+    .from("tasks")
+    .select("*", { count: "exact", head: true })
+    .in("project_id", projectIds)
+    .eq("status", TaskStatus.PENDING);
 
   return {
     projectCount: projectCount || 0,
     totalTasks: totalTasks || 0,
     completedTasks: completedTasks || 0,
     pendingTasks: pendingTasks || 0,
-  }
+  };
 }

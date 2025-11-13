@@ -3,37 +3,37 @@
  * Chat interface for all projects with project selector
  */
 
-import { Suspense } from 'react'
-import { createServerClient } from '@/lib/supabase/server'
-import { getProjects } from '@/lib/supabase/queries'
-import { redirect } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
-import { GlobalChatInterface } from '@/components/chat/GlobalChatInterface'
+import { Suspense } from "react";
+import { createServerClient } from "@/lib/supabase/server";
+import { getProjects } from "@/lib/supabase/queries";
+import { redirect } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { GlobalChatInterface } from "@/components/chat/GlobalChatInterface";
 
 export default async function ChatPage() {
-  const supabase = await createServerClient()
+  const supabase = await createServerClient();
 
   // Check authentication
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login')
+    redirect("/login");
   }
 
   // Get user's projects
-  const projects = await getProjects(supabase)
+  const projects = await getProjects(supabase);
 
   // If no projects, redirect to create one
   if (!projects || projects.length === 0) {
-    redirect('/projects/new')
+    redirect("/projects/new");
   }
 
   // Get default project (we know projects.length > 0 here)
-  const defaultProjectId = projects[0]?.id
+  const defaultProjectId = projects[0]?.id;
   if (!defaultProjectId) {
-    redirect('/projects/new')
+    redirect("/projects/new");
   }
 
   return (
@@ -63,10 +63,10 @@ export default async function ChatPage() {
         </Suspense>
       </div>
     </div>
-  )
+  );
 }
 
 export const metadata = {
-  title: 'Chat - Claude Project Manager',
-  description: 'AI-powered chat assistant for your projects',
-}
+  title: "Chat - Claude Project Manager",
+  description: "AI-powered chat assistant for your projects",
+};

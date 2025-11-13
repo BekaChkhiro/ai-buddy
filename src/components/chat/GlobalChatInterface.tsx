@@ -3,35 +3,32 @@
  * Chat interface with project selector for cross-project chatting
  */
 
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { ChatInterface } from './ChatInterface'
+import { useState } from "react";
+import { ChatInterface } from "./ChatInterface";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Folder } from 'lucide-react'
+} from "@/components/ui/select";
+import { Folder } from "lucide-react";
 
 interface Project {
-  id: string
-  name: string
-  description: string | null
+  id: string;
+  name: string;
+  description: string | null;
 }
 
 interface GlobalChatInterfaceProps {
-  projects: Project[]
-  defaultProjectId: string
+  projects: Project[];
+  defaultProjectId: string;
 }
 
-export function GlobalChatInterface({
-  projects,
-  defaultProjectId,
-}: GlobalChatInterfaceProps) {
-  const [selectedProjectId, setSelectedProjectId] = useState(defaultProjectId)
+export function GlobalChatInterface({ projects, defaultProjectId }: GlobalChatInterfaceProps) {
+  const [selectedProjectId, setSelectedProjectId] = useState(defaultProjectId);
 
   return (
     <div className="flex flex-col h-full">
@@ -70,5 +67,5 @@ export function GlobalChatInterface({
         />
       </div>
     </div>
-  )
+  );
 }

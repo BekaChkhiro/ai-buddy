@@ -3,8 +3,8 @@
  * Handles session retrieval, validation, and refresh
  */
 
-import { createBrowserClient } from '@/lib/supabase/client'
-import type { Session } from '@supabase/supabase-js'
+import { createBrowserClient } from "@/lib/supabase/client";
+import type { Session } from "@supabase/supabase-js";
 
 // =====================================================
 // SESSION RETRIEVAL
@@ -14,14 +14,14 @@ import type { Session } from '@supabase/supabase-js'
  * Get current session (client-side)
  */
 export async function getSession(): Promise<Session | null> {
-  const supabase = createBrowserClient()
-  const { data, error } = await supabase.auth.getSession()
+  const supabase = createBrowserClient();
+  const { data, error } = await supabase.auth.getSession();
 
   if (error || !data.session) {
-    return null
+    return null;
   }
 
-  return data.session
+  return data.session;
 }
 
 // =====================================================
@@ -33,11 +33,11 @@ export async function getSession(): Promise<Session | null> {
  */
 export function isSessionValid(session: Session | null): boolean {
   if (!session) {
-    return false
+    return false;
   }
 
-  const now = Math.floor(Date.now() / 1000)
-  return session.expires_at ? session.expires_at > now : false
+  const now = Math.floor(Date.now() / 1000);
+  return session.expires_at ? session.expires_at > now : false;
 }
 
 /**
@@ -45,19 +45,19 @@ export function isSessionValid(session: Session | null): boolean {
  */
 export function getSessionTimeRemaining(session: Session | null): number {
   if (!session || !session.expires_at) {
-    return 0
+    return 0;
   }
 
-  const now = Math.floor(Date.now() / 1000)
-  return Math.max(0, session.expires_at - now)
+  const now = Math.floor(Date.now() / 1000);
+  return Math.max(0, session.expires_at - now);
 }
 
 /**
  * Check if session will expire soon (within 5 minutes)
  */
 export function isSessionExpiringSoon(session: Session | null): boolean {
-  const timeRemaining = getSessionTimeRemaining(session)
-  return timeRemaining > 0 && timeRemaining < 300 // 5 minutes
+  const timeRemaining = getSessionTimeRemaining(session);
+  return timeRemaining > 0 && timeRemaining < 300; // 5 minutes
 }
 
 // =====================================================
@@ -68,31 +68,31 @@ export function isSessionExpiringSoon(session: Session | null): boolean {
  * Refresh the current session (client-side)
  */
 export async function refreshSession(): Promise<Session | null> {
-  const supabase = createBrowserClient()
-  const { data, error } = await supabase.auth.refreshSession()
+  const supabase = createBrowserClient();
+  const { data, error } = await supabase.auth.refreshSession();
 
   if (error || !data.session) {
-    return null
+    return null;
   }
 
-  return data.session
+  return data.session;
 }
 
 /**
  * Refresh session if it's expiring soon
  */
 export async function refreshSessionIfNeeded(): Promise<Session | null> {
-  const session = await getSession()
+  const session = await getSession();
 
   if (!session) {
-    return null
+    return null;
   }
 
   if (isSessionExpiringSoon(session)) {
-    return refreshSession()
+    return refreshSession();
   }
 
-  return session
+  return session;
 }
 
 // =====================================================
@@ -103,21 +103,21 @@ export async function refreshSessionIfNeeded(): Promise<Session | null> {
  * Extract user ID from session
  */
 export function getUserIdFromSession(session: Session | null): string | null {
-  return session?.user?.id || null
+  return session?.user?.id || null;
 }
 
 /**
  * Extract user email from session
  */
 export function getUserEmailFromSession(session: Session | null): string | null {
-  return session?.user?.email || null
+  return session?.user?.email || null;
 }
 
 /**
  * Extract user metadata from session
  */
 export function getUserMetadataFromSession(session: Session | null): Record<string, any> {
-  return session?.user?.user_metadata || {}
+  return session?.user?.user_metadata || {};
 }
 
 // =====================================================
@@ -128,43 +128,43 @@ export function getUserMetadataFromSession(session: Session | null): Record<stri
  * Clear session storage (useful for logout)
  */
 export async function clearSessionStorage(): Promise<void> {
-  if (typeof window === 'undefined') {
-    return
+  if (typeof window === "undefined") {
+    return;
   }
 
   // Clear any auth-related localStorage items
-  const keysToRemove: string[] = []
+  const keysToRemove: string[] = [];
   for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
-    if (key && key.startsWith('sb-')) {
-      keysToRemove.push(key)
+    const key = localStorage.key(i);
+    if (key && key.startsWith("sb-")) {
+      keysToRemove.push(key);
     }
   }
 
-  keysToRemove.forEach(key => localStorage.removeItem(key))
+  keysToRemove.forEach((key) => localStorage.removeItem(key));
 }
 
 // =====================================================
 // AUTO REFRESH
 // =====================================================
 
-let refreshInterval: NodeJS.Timeout | null = null
+let refreshInterval: NodeJS.Timeout | null = null;
 
 /**
  * Start auto-refresh interval (checks every minute)
  */
 export function startAutoRefresh(): void {
-  if (typeof window === 'undefined') {
-    return
+  if (typeof window === "undefined") {
+    return;
   }
 
   if (refreshInterval) {
-    return // Already running
+    return; // Already running
   }
 
   refreshInterval = setInterval(async () => {
-    await refreshSessionIfNeeded()
-  }, 60000) // Check every minute
+    await refreshSessionIfNeeded();
+  }, 60000); // Check every minute
 }
 
 /**
@@ -172,7 +172,7 @@ export function startAutoRefresh(): void {
  */
 export function stopAutoRefresh(): void {
   if (refreshInterval) {
-    clearInterval(refreshInterval)
-    refreshInterval = null
+    clearInterval(refreshInterval);
+    refreshInterval = null;
   }
 }

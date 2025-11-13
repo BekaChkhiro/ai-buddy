@@ -18,7 +18,8 @@
       "Bash(if [ -f .env.local ])",
       "Bash(then grep -q \"ANTHROPIC_API_KEY\" .env.local)",
       "Bash(else echo \"❌ .env.local file not found\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []

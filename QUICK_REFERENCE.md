@@ -19,6 +19,7 @@ npm run dev
 ## Supabase Usage
 
 ### Client Component
+
 ```typescript
 "use client";
 import { createClient } from "@/lib/supabase/client";
@@ -30,6 +31,7 @@ export default function MyComponent() {
 ```
 
 ### Server Component
+
 ```typescript
 import { createClient } from "@/lib/supabase/server";
 
@@ -40,6 +42,7 @@ export default async function MyServerComponent() {
 ```
 
 ### Generate Types
+
 ```bash
 # After creating database schema
 npm run types:supabase
@@ -50,6 +53,7 @@ npm run types:supabase
 ## shadcn/ui Components
 
 ### Import Pattern
+
 ```typescript
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,6 +61,7 @@ import { Input } from "@/components/ui/input";
 ```
 
 ### Available Components
+
 - button, input, textarea
 - card, dialog, sheet
 - toast, dropdown-menu
@@ -64,6 +69,7 @@ import { Input } from "@/components/ui/input";
 - avatar, scroll-area
 
 ### Add More Components
+
 ```bash
 npx shadcn@latest add [component-name]
 ```
@@ -73,6 +79,7 @@ npx shadcn@latest add [component-name]
 ## Dark Mode
 
 ### Add to Layout
+
 ```typescript
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
@@ -97,6 +104,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 ### Theme Toggle
+
 ```typescript
 import { ThemeToggle } from "@/components/theme-toggle";
 

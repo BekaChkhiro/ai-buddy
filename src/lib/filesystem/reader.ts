@@ -3,23 +3,18 @@
  * Secure file reading with size limits and validation
  */
 
-import fs from 'fs/promises'
-import path from 'path'
-import { fileTypeFromFile } from 'file-type'
-import mime from 'mime-types'
-import { validatePathOrThrow } from './validator'
-import {
-  ReadFileOptions,
-  FileInfo,
-  NotFoundError,
-  SizeLimitError,
-} from './types'
+import fs from "fs/promises";
+import path from "path";
+import { fileTypeFromFile } from "file-type";
+import mime from "mime-types";
+import { validatePathOrThrow } from "./validator";
+import { ReadFileOptions, FileInfo, NotFoundError, SizeLimitError } from "./types";
 import {
   MAX_FILE_SIZE,
   DEFAULT_ENCODING,
   TEXT_FILE_EXTENSIONS,
   BINARY_FILE_EXTENSIONS,
-} from './constants'
+} from "./constants";
 
 /**
  * Safely read a file with size validation and security checks
@@ -38,28 +33,25 @@ export async function readFile(
   filePath: string,
   options: ReadFileOptions = {}
 ): Promise<string> {
-  const {
-    encoding = DEFAULT_ENCODING,
-    maxSize = MAX_FILE_SIZE,
-  } = options
+  const { encoding = DEFAULT_ENCODING, maxSize = MAX_FILE_SIZE } = options;
 
   // Validate path
-  const absolutePath = await validatePathOrThrow(projectPath, filePath)
+  const absolutePath = await validatePathOrThrow(projectPath, filePath);
 
   // Check if file exists
-  let stats
+  let stats;
   try {
-    stats = await fs.stat(absolutePath)
+    stats = await fs.stat(absolutePath);
   } catch (error: any) {
-    if (error.code === 'ENOENT') {
-      throw new NotFoundError(`File not found: ${filePath}`)
+    if (error.code === "ENOENT") {
+      throw new NotFoundError(`File not found: ${filePath}`);
     }
-    throw error
+    throw error;
   }
 
   // Check if it's a file
   if (!stats.isFile()) {
-    throw new NotFoundError(`Path is not a file: ${filePath}`)
+    throw new NotFoundError(`Path is not a file: ${filePath}`);
   }
 
   // Check file size
@@ -67,18 +59,18 @@ export async function readFile(
     throw new SizeLimitError(
       `File size (${formatBytes(stats.size)}) exceeds limit (${formatBytes(maxSize)})`,
       { size: stats.size, limit: maxSize }
-    )
+    );
   }
 
   // Read file content
   try {
-    const content = await fs.readFile(absolutePath, { encoding })
-    return content
+    const content = await fs.readFile(absolutePath, { encoding });
+    return content;
   } catch (error: any) {
-    if (error.code === 'EACCES') {
-      throw new NotFoundError(`Permission denied: ${filePath}`)
+    if (error.code === "EACCES") {
+      throw new NotFoundError(`Permission denied: ${filePath}`);
     }
-    throw error
+    throw error;
   }
 }
 
@@ -89,25 +81,22 @@ export async function readFile(
  * @param filePath - The file path relative to project root
  * @returns File information
  */
-export async function getFileInfo(
-  projectPath: string,
-  filePath: string
-): Promise<FileInfo> {
-  const absolutePath = await validatePathOrThrow(projectPath, filePath)
+export async function getFileInfo(projectPath: string, filePath: string): Promise<FileInfo> {
+  const absolutePath = await validatePathOrThrow(projectPath, filePath);
 
-  let stats
+  let stats;
   try {
-    stats = await fs.stat(absolutePath)
+    stats = await fs.stat(absolutePath);
   } catch (error: any) {
-    if (error.code === 'ENOENT') {
-      throw new NotFoundError(`File not found: ${filePath}`)
+    if (error.code === "ENOENT") {
+      throw new NotFoundError(`File not found: ${filePath}`);
     }
-    throw error
+    throw error;
   }
 
-  const extension = path.extname(filePath).toLowerCase()
-  const mimeType = mime.lookup(filePath) || undefined
-  const isText = await isTextFile(absolutePath)
+  const extension = path.extname(filePath).toLowerCase();
+  const mimeType = mime.lookup(filePath) || undefined;
+  const isText = await isTextFile(absolutePath);
 
   return {
     exists: true,
@@ -120,7 +109,7 @@ export async function getFileInfo(
     createdAt: stats.birthtime,
     isText,
     isBinary: !isText,
-  }
+  };
 }
 
 /**
@@ -130,31 +119,31 @@ export async function getFileInfo(
  * @returns true if file is text
  */
 export async function isTextFile(filePath: string): Promise<boolean> {
-  const extension = path.extname(filePath).toLowerCase()
+  const extension = path.extname(filePath).toLowerCase();
 
   // Check extension first (fast path)
   if (TEXT_FILE_EXTENSIONS.has(extension)) {
-    return true
+    return true;
   }
 
   if (BINARY_FILE_EXTENSIONS.has(extension)) {
-    return false
+    return false;
   }
 
   // For unknown extensions, check file content
   try {
-    const fileType = await fileTypeFromFile(filePath)
+    const fileType = await fileTypeFromFile(filePath);
 
     // If file-type can detect it, it's likely binary
     if (fileType) {
-      return false
+      return false;
     }
 
     // No known binary signature, likely text
-    return true
+    return true;
   } catch (error) {
     // If we can't determine, assume text
-    return true
+    return true;
   }
 }
 
@@ -165,20 +154,17 @@ export async function isTextFile(filePath: string): Promise<boolean> {
  * @param filePath - The file path relative to project root
  * @returns File size in bytes
  */
-export async function getFileSize(
-  projectPath: string,
-  filePath: string
-): Promise<number> {
-  const absolutePath = await validatePathOrThrow(projectPath, filePath)
+export async function getFileSize(projectPath: string, filePath: string): Promise<number> {
+  const absolutePath = await validatePathOrThrow(projectPath, filePath);
 
   try {
-    const stats = await fs.stat(absolutePath)
-    return stats.size
+    const stats = await fs.stat(absolutePath);
+    return stats.size;
   } catch (error: any) {
-    if (error.code === 'ENOENT') {
-      throw new NotFoundError(`File not found: ${filePath}`)
+    if (error.code === "ENOENT") {
+      throw new NotFoundError(`File not found: ${filePath}`);
     }
-    throw error
+    throw error;
   }
 }
 
@@ -189,16 +175,13 @@ export async function getFileSize(
  * @param filePath - The file path relative to project root
  * @returns true if file exists
  */
-export async function fileExists(
-  projectPath: string,
-  filePath: string
-): Promise<boolean> {
+export async function fileExists(projectPath: string, filePath: string): Promise<boolean> {
   try {
-    const absolutePath = await validatePathOrThrow(projectPath, filePath)
-    await fs.access(absolutePath)
-    return true
+    const absolutePath = await validatePathOrThrow(projectPath, filePath);
+    await fs.access(absolutePath);
+    return true;
   } catch (error) {
-    return false
+    return false;
   }
 }
 
@@ -217,22 +200,22 @@ export async function readFiles(
 ): Promise<Array<{ path: string; content: string; error?: string }>> {
   const results = await Promise.allSettled(
     filePaths.map(async (filePath) => {
-      const content = await readFile(projectPath, filePath, options)
-      return { path: filePath, content }
+      const content = await readFile(projectPath, filePath, options);
+      return { path: filePath, content };
     })
-  )
+  );
 
   return results.map((result, index) => {
-    if (result.status === 'fulfilled') {
-      return result.value
+    if (result.status === "fulfilled") {
+      return result.value;
     } else {
       return {
-        path: filePaths[index],
-        content: '',
-        error: result.reason.message || 'Failed to read file',
-      }
+        path: filePaths[index]!,
+        content: "",
+        error: result.reason.message || "Failed to read file",
+      };
     }
-  })
+  });
 }
 
 /**
@@ -242,7 +225,7 @@ export async function readFiles(
  * @returns MIME type or undefined
  */
 export function getMimeType(filePath: string): string | undefined {
-  return mime.lookup(filePath) || undefined
+  return mime.lookup(filePath) || undefined;
 }
 
 /**
@@ -252,13 +235,13 @@ export function getMimeType(filePath: string): string | undefined {
  * @returns Formatted string (e.g., "1.5 MB")
  */
 export function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 Bytes'
+  if (bytes === 0) return "0 Bytes";
 
-  const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 }
 
 /**
@@ -275,9 +258,9 @@ export async function isWithinSizeLimit(
   maxSize: number = MAX_FILE_SIZE
 ): Promise<boolean> {
   try {
-    const size = await getFileSize(projectPath, filePath)
-    return size <= maxSize
+    const size = await getFileSize(projectPath, filePath);
+    return size <= maxSize;
   } catch (error) {
-    return false
+    return false;
   }
 }

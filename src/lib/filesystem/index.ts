@@ -4,22 +4,22 @@
  */
 
 // Types
-export * from './types'
+export * from "./types";
 
 // Constants
-export * from './constants'
+export * from "./constants";
 
 // Validators
-export * from './validator'
+export * from "./validator";
 
 // Git ignore
-export * from './gitignore'
+export * from "./gitignore";
 
 // Reader
-export * from './reader'
+export * from "./reader";
 
 // Writer
-export * from './writer'
+export * from "./writer";
 
 // Structure
-export * from './structure'
+export * from "./structure";

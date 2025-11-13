@@ -7,101 +7,101 @@
  * File node in directory tree structure
  */
 export interface FileNode {
-  name: string
-  path: string
-  relativePath: string
-  type: 'file' | 'directory'
-  size?: number
-  extension?: string
-  mimeType?: string
-  modifiedAt?: Date
-  children?: FileNode[]
+  name: string;
+  path: string;
+  relativePath: string;
+  type: "file" | "directory";
+  size?: number;
+  extension?: string;
+  mimeType?: string;
+  modifiedAt?: Date;
+  children?: FileNode[];
 }
 
 /**
  * Options for reading files
  */
 export interface ReadFileOptions {
-  encoding?: BufferEncoding
-  maxSize?: number
+  encoding?: BufferEncoding;
+  maxSize?: number;
 }
 
 /**
  * Options for writing files
  */
 export interface WriteFileOptions {
-  encoding?: BufferEncoding
-  createBackup?: boolean
-  createDirectories?: boolean
+  encoding?: BufferEncoding;
+  createBackup?: boolean;
+  createDirectories?: boolean;
 }
 
 /**
  * Options for getting directory structure
  */
 export interface StructureOptions {
-  depth?: number
-  includeHidden?: boolean
-  respectGitignore?: boolean
-  includeStats?: boolean
+  depth?: number;
+  includeHidden?: boolean;
+  respectGitignore?: boolean;
+  includeStats?: boolean;
 }
 
 /**
  * Options for file watcher
  */
 export interface WatcherOptions {
-  ignored?: string[]
-  respectGitignore?: boolean
-  debounceMs?: number
+  ignored?: string[];
+  respectGitignore?: boolean;
+  debounceMs?: number;
 }
 
 /**
  * File change event
  */
 export interface FileChangeEvent {
-  type: 'add' | 'change' | 'unlink' | 'addDir' | 'unlinkDir'
-  path: string
-  relativePath: string
-  timestamp: number
+  type: "add" | "change" | "unlink" | "addDir" | "unlinkDir";
+  path: string;
+  relativePath: string;
+  timestamp: number;
   stats?: {
-    size: number
-    modifiedAt: Date
-  }
+    size: number;
+    modifiedAt: Date;
+  };
 }
 
 /**
  * Validation result
  */
 export interface ValidationResult {
-  valid: boolean
-  normalizedPath?: string
-  error?: string
-  reason?: string
+  valid: boolean;
+  normalizedPath?: string;
+  error?: string;
+  reason?: string;
 }
 
 /**
  * File info result
  */
 export interface FileInfo {
-  exists: boolean
-  isFile: boolean
-  isDirectory: boolean
-  size: number
-  mimeType?: string
-  extension?: string
-  modifiedAt: Date
-  createdAt: Date
-  isText: boolean
-  isBinary: boolean
+  exists: boolean;
+  isFile: boolean;
+  isDirectory: boolean;
+  size: number;
+  mimeType?: string;
+  extension?: string;
+  modifiedAt: Date;
+  createdAt: Date;
+  isText: boolean;
+  isBinary: boolean;
 }
 
 /**
  * Directory stats
  */
 export interface DirectoryStats {
-  totalFiles: number
-  totalDirectories: number
-  totalSize: number
-  fileTypes: Record<string, number>
+  totalFiles: number;
+  totalDirectories: number;
+  totalSize: number;
+  fileTypes: Record<string, number>;
 }
 
 /**
@@ -113,8 +113,8 @@ export class FileSystemError extends Error {
     public code?: string,
     public details?: any
   ) {
-    super(message)
-    this.name = 'FileSystemError'
+    super(message);
+    this.name = "FileSystemError";
   }
 }
 
@@ -123,8 +123,8 @@ export class FileSystemError extends Error {
  */
 export class ValidationError extends FileSystemError {
   constructor(message: string, details?: any) {
-    super(message, 'VALIDATION_ERROR', details)
-    this.name = 'ValidationError'
+    super(message, "VALIDATION_ERROR", details);
+    this.name = "ValidationError";
   }
 }
 
@@ -133,8 +133,8 @@ export class ValidationError extends FileSystemError {
  */
 export class PermissionError extends FileSystemError {
   constructor(message: string, details?: any) {
-    super(message, 'PERMISSION_ERROR', details)
-    this.name = 'PermissionError'
+    super(message, "PERMISSION_ERROR", details);
+    this.name = "PermissionError";
   }
 }
 
@@ -143,8 +143,8 @@ export class PermissionError extends FileSystemError {
  */
 export class SizeLimitError extends FileSystemError {
   constructor(message: string, details?: any) {
-    super(message, 'SIZE_LIMIT_ERROR', details)
-    this.name = 'SizeLimitError'
+    super(message, "SIZE_LIMIT_ERROR", details);
+    this.name = "SizeLimitError";
   }
 }
 
@@ -153,8 +153,8 @@ export class SizeLimitError extends FileSystemError {
  */
 export class NotFoundError extends FileSystemError {
   constructor(message: string, details?: any) {
-    super(message, 'NOT_FOUND_ERROR', details)
-    this.name = 'NotFoundError'
+    super(message, "NOT_FOUND_ERROR", details);
+    this.name = "NotFoundError";
   }
 }
 
@@ -163,7 +163,7 @@ export class NotFoundError extends FileSystemError {
  */
 export class RateLimitError extends FileSystemError {
   constructor(message: string, details?: any) {
-    super(message, 'RATE_LIMIT_ERROR', details)
-    this.name = 'RateLimitError'
+    super(message, "RATE_LIMIT_ERROR", details);
+    this.name = "RateLimitError";
   }
 }

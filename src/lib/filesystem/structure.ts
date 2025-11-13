@@ -3,18 +3,13 @@
  * Get directory tree structure with .gitignore respect
  */
 
-import fs from 'fs/promises'
-import path from 'path'
-import { validatePathOrThrow } from './validator'
-import { shouldIgnore } from './gitignore'
-import { getMimeType } from './reader'
-import {
-  FileNode,
-  StructureOptions,
-  DirectoryStats,
-  NotFoundError,
-} from './types'
-import { MAX_DIRECTORY_DEPTH } from './constants'
+import fs from "fs/promises";
+import path from "path";
+import { validatePathOrThrow } from "./validator";
+import { shouldIgnore } from "./gitignore";
+import { getMimeType } from "./reader";
+import { FileNode, StructureOptions, DirectoryStats, NotFoundError } from "./types";
+import { MAX_DIRECTORY_DEPTH } from "./constants";
 
 /**
  * Get directory structure as a tree
@@ -26,7 +21,7 @@ import { MAX_DIRECTORY_DEPTH } from './constants'
  */
 export async function getDirectoryStructure(
   projectPath: string,
-  relativePath: string = '',
+  relativePath: string = "",
   options: StructureOptions = {}
 ): Promise<FileNode[]> {
   const {
@@ -34,23 +29,23 @@ export async function getDirectoryStructure(
     includeHidden = false,
     respectGitignore = true,
     includeStats = true,
-  } = options
+  } = options;
 
-  const absolutePath = await validatePathOrThrow(projectPath, relativePath)
+  const absolutePath = await validatePathOrThrow(projectPath, relativePath);
 
   // Check if path exists and is a directory
-  let stats
+  let stats;
   try {
-    stats = await fs.stat(absolutePath)
+    stats = await fs.stat(absolutePath);
   } catch (error: any) {
-    if (error.code === 'ENOENT') {
-      throw new NotFoundError(`Directory not found: ${relativePath}`)
+    if (error.code === "ENOENT") {
+      throw new NotFoundError(`Directory not found: ${relativePath}`);
     }
-    throw error
+    throw error;
   }
 
   if (!stats.isDirectory()) {
-    throw new NotFoundError(`Path is not a directory: ${relativePath}`)
+    throw new NotFoundError(`Path is not a directory: ${relativePath}`);
   }
 
   return await buildDirectoryTree(
@@ -60,7 +55,7 @@ export async function getDirectoryStructure(
     includeHidden,
     respectGitignore,
     includeStats
-  )
+  );
 }
 
 /**
@@ -76,51 +71,51 @@ async function buildDirectoryTree(
   currentDepth: number = 0
 ): Promise<FileNode[]> {
   if (currentDepth >= depth) {
-    return []
+    return [];
   }
 
-  let entries
+  let entries;
   try {
-    entries = await fs.readdir(currentPath, { withFileTypes: true })
+    entries = await fs.readdir(currentPath, { withFileTypes: true });
   } catch (error: any) {
     // If we can't read the directory, return empty array
-    return []
+    return [];
   }
 
-  const nodes: FileNode[] = []
+  const nodes: FileNode[] = [];
 
   for (const entry of entries) {
-    const fullPath = path.join(currentPath, entry.name)
-    const relativePath = path.relative(projectPath, fullPath)
+    const fullPath = path.join(currentPath, entry.name);
+    const relativePath = path.relative(projectPath, fullPath);
 
     // Skip hidden files unless explicitly included
-    if (!includeHidden && entry.name.startsWith('.')) {
-      continue
+    if (!includeHidden && entry.name.startsWith(".")) {
+      continue;
     }
 
     // Check gitignore
-    if (respectGitignore && await shouldIgnore(projectPath, fullPath)) {
-      continue
+    if (respectGitignore && (await shouldIgnore(projectPath, fullPath))) {
+      continue;
     }
 
     const node: FileNode = {
       name: entry.name,
       path: fullPath,
       relativePath,
-      type: entry.isDirectory() ? 'directory' : 'file',
-    }
+      type: entry.isDirectory() ? "directory" : "file",
+    };
 
     // Add stats if requested
     if (includeStats) {
       try {
-        const stats = await fs.stat(fullPath)
-        node.modifiedAt = stats.mtime
-        node.size = entry.isFile() ? stats.size : undefined
+        const stats = await fs.stat(fullPath);
+        node.modifiedAt = stats.mtime;
+        node.size = entry.isFile() ? stats.size : undefined;
 
         if (entry.isFile()) {
-          const extension = path.extname(entry.name).toLowerCase()
-          node.extension = extension
-          node.mimeType = getMimeType(entry.name)
+          const extension = path.extname(entry.name).toLowerCase();
+          node.extension = extension;
+          node.mimeType = getMimeType(entry.name);
         }
       } catch (error) {
         // Stats failed, skip them
@@ -138,23 +133,23 @@ async function buildDirectoryTree(
           respectGitignore,
           includeStats,
           currentDepth + 1
-        )
+        );
       } catch (error) {
         // Failed to read subdirectory, set empty children
-        node.children = []
+        node.children = [];
       }
     }
 
-    nodes.push(node)
+    nodes.push(node);
   }
 
   // Sort: directories first, then files, alphabetically
   return nodes.sort((a, b) => {
     if (a.type !== b.type) {
-      return a.type === 'directory' ? -1 : 1
+      return a.type === "directory" ? -1 : 1;
     }
-    return a.name.localeCompare(b.name)
-  })
+    return a.name.localeCompare(b.name);
+  });
 }
 
 /**
@@ -167,24 +162,24 @@ async function buildDirectoryTree(
  */
 export async function listAllFiles(
   projectPath: string,
-  relativePath: string = '',
+  relativePath: string = "",
   options: StructureOptions = {}
 ): Promise<string[]> {
-  const structure = await getDirectoryStructure(projectPath, relativePath, options)
-  const files: string[] = []
+  const structure = await getDirectoryStructure(projectPath, relativePath, options);
+  const files: string[] = [];
 
   function collectFiles(nodes: FileNode[]) {
     for (const node of nodes) {
-      if (node.type === 'file') {
-        files.push(node.relativePath)
+      if (node.type === "file") {
+        files.push(node.relativePath);
       } else if (node.children) {
-        collectFiles(node.children)
+        collectFiles(node.children);
       }
     }
   }
 
-  collectFiles(structure)
-  return files
+  collectFiles(structure);
+  return files;
 }
 
 /**
@@ -197,40 +192,40 @@ export async function listAllFiles(
  */
 export async function getDirectoryStats(
   projectPath: string,
-  relativePath: string = '',
+  relativePath: string = "",
   options: StructureOptions = {}
 ): Promise<DirectoryStats> {
   const structure = await getDirectoryStructure(projectPath, relativePath, {
     ...options,
     includeStats: true,
-  })
+  });
 
   const stats: DirectoryStats = {
     totalFiles: 0,
     totalDirectories: 0,
     totalSize: 0,
     fileTypes: {},
-  }
+  };
 
   function collectStats(nodes: FileNode[]) {
     for (const node of nodes) {
-      if (node.type === 'directory') {
-        stats.totalDirectories++
+      if (node.type === "directory") {
+        stats.totalDirectories++;
         if (node.children) {
-          collectStats(node.children)
+          collectStats(node.children);
         }
       } else {
-        stats.totalFiles++
-        stats.totalSize += node.size || 0
+        stats.totalFiles++;
+        stats.totalSize += node.size || 0;
 
-        const extension = node.extension || 'none'
-        stats.fileTypes[extension] = (stats.fileTypes[extension] || 0) + 1
+        const extension = node.extension || "none";
+        stats.fileTypes[extension] = (stats.fileTypes[extension] || 0) + 1;
       }
     }
   }
 
-  collectStats(structure)
-  return stats
+  collectStats(structure);
+  return stats;
 }
 
 /**
@@ -246,17 +241,14 @@ export async function searchFiles(
   pattern: string,
   options: StructureOptions = {}
 ): Promise<string[]> {
-  const allFiles = await listAllFiles(projectPath, '', options)
+  const allFiles = await listAllFiles(projectPath, "", options);
 
   // Simple pattern matching (can be enhanced with more sophisticated matching)
-  const regexPattern = pattern
-    .replace(/\./g, '\\.')
-    .replace(/\*/g, '.*')
-    .replace(/\?/g, '.')
+  const regexPattern = pattern.replace(/\./g, "\\.").replace(/\*/g, ".*").replace(/\?/g, ".");
 
-  const regex = new RegExp(regexPattern, 'i')
+  const regex = new RegExp(regexPattern, "i");
 
-  return allFiles.filter(file => regex.test(path.basename(file)))
+  return allFiles.filter((file) => regex.test(path.basename(file)));
 }
 
 /**
@@ -272,11 +264,11 @@ export async function findFilesByExtension(
   extensions: string[],
   options: StructureOptions = {}
 ): Promise<string[]> {
-  const allFiles = await listAllFiles(projectPath, '', options)
-  const extensionSet = new Set(extensions.map(ext => ext.toLowerCase()))
+  const allFiles = await listAllFiles(projectPath, "", options);
+  const extensionSet = new Set(extensions.map((ext) => ext.toLowerCase()));
 
-  return allFiles.filter(file => {
-    const ext = path.extname(file).toLowerCase()
-    return extensionSet.has(ext)
-  })
+  return allFiles.filter((file) => {
+    const ext = path.extname(file).toLowerCase();
+    return extensionSet.has(ext);
+  });
 }

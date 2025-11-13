@@ -3,67 +3,65 @@
  * Display project statistics and metrics
  */
 
-'use client'
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle2, Circle, Clock, XCircle, AlertCircle } from 'lucide-react'
-import { Project } from '@/types'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle2, Circle, Clock, XCircle, AlertCircle } from "lucide-react";
+import { Project } from "@/types";
 
 interface ProjectStatsProps {
-  project: Project
+  project: Project;
   stats: {
-    total: number
-    pending: number
-    inProgress: number
-    completed: number
-    failed: number
-    blocked: number
-  }
+    total: number;
+    pending: number;
+    inProgress: number;
+    completed: number;
+    failed: number;
+    blocked: number;
+  };
 }
 
 export function ProjectStats({ project, stats }: ProjectStatsProps) {
-  const completionRate = stats.total > 0
-    ? Math.round((stats.completed / stats.total) * 100)
-    : 0
+  const completionRate = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
 
   const statItems = [
     {
-      label: 'Total Tasks',
+      label: "Total Tasks",
       value: stats.total,
       icon: Circle,
-      color: 'text-muted-foreground'
+      color: "text-muted-foreground",
     },
     {
-      label: 'Completed',
+      label: "Completed",
       value: stats.completed,
       icon: CheckCircle2,
-      color: 'text-green-600'
+      color: "text-green-600",
     },
     {
-      label: 'In Progress',
+      label: "In Progress",
       value: stats.inProgress,
       icon: Clock,
-      color: 'text-blue-600'
+      color: "text-blue-600",
     },
     {
-      label: 'Pending',
+      label: "Pending",
       value: stats.pending,
       icon: Circle,
-      color: 'text-yellow-600'
+      color: "text-yellow-600",
     },
     {
-      label: 'Failed',
+      label: "Failed",
       value: stats.failed,
       icon: XCircle,
-      color: 'text-red-600'
+      color: "text-red-600",
     },
     {
-      label: 'Blocked',
+      label: "Blocked",
       value: stats.blocked,
       icon: AlertCircle,
-      color: 'text-orange-600'
-    }
-  ]
+      color: "text-orange-600",
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -99,9 +97,7 @@ export function ProjectStats({ project, stats }: ProjectStatsProps) {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {item.label}
-                  </p>
+                  <p className="text-sm font-medium text-muted-foreground">{item.label}</p>
                   <p className="text-2xl font-bold mt-2">{item.value}</p>
                 </div>
                 <item.icon className={`h-8 w-8 ${item.color}`} />
@@ -147,9 +143,7 @@ export function ProjectStats({ project, stats }: ProjectStatsProps) {
           {project.folderPath && (
             <div>
               <span className="font-medium">Folder Path:</span>
-              <p className="text-muted-foreground mt-1 font-mono text-xs">
-                {project.folderPath}
-              </p>
+              <p className="text-muted-foreground mt-1 font-mono text-xs">{project.folderPath}</p>
             </div>
           )}
           <div>
@@ -167,5 +161,5 @@ export function ProjectStats({ project, stats }: ProjectStatsProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
