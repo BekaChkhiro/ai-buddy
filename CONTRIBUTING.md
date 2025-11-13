@@ -165,7 +165,6 @@ docs(readme): update installation instructions
    ```
 
 3. **Create a Pull Request** with:
-
    - Clear title following commit message conventions
    - Description of changes and motivation
    - Link to related issue(s)

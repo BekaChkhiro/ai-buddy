@@ -11,9 +11,6 @@ import type { ThemeProviderProps as NextThemesProviderProps } from "next-themes"
  * @param children - React children components
  * @param props - Additional theme provider props from next-themes
  */
-export function ThemeProvider({
-  children,
-  ...props
-}: NextThemesProviderProps) {
+export function ThemeProvider({ children, ...props }: NextThemesProviderProps) {
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }

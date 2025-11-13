@@ -3,47 +3,47 @@
  * Form for creating and editing projects
  */
 
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { X } from 'lucide-react'
-import { Project } from '@/types'
-import { FolderPicker } from './FolderPicker'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
+import { Project } from "@/types";
+import { FolderPicker } from "./FolderPicker";
 
 interface ProjectFormProps {
-  project?: Project
-  onSubmit: (data: any) => Promise<void>
-  onCancel?: () => void
-  isLoading?: boolean
+  project?: Project;
+  onSubmit: (data: any) => Promise<void>;
+  onCancel?: () => void;
+  isLoading?: boolean;
 }
 
 export function ProjectForm({ project, onSubmit, onCancel, isLoading }: ProjectFormProps) {
   const [formData, setFormData] = useState({
-    name: project?.name || '',
-    description: project?.description || '',
-    folderPath: project?.folderPath || '',
-    techStack: project?.techStack || []
-  })
-  const [techInput, setTechInput] = useState('')
-  const [errors, setErrors] = useState<Record<string, string>>({})
+    name: project?.name || "",
+    description: project?.description || "",
+    folderPath: project?.folderPath || "",
+    techStack: project?.techStack || [],
+  });
+  const [techInput, setTechInput] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // Validate
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) {
-      newErrors.name = 'Project name is required'
+      newErrors.name = "Project name is required";
     }
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
+      setErrors(newErrors);
+      return;
     }
 
     try {
@@ -51,37 +51,37 @@ export function ProjectForm({ project, onSubmit, onCancel, isLoading }: ProjectF
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         folderPath: formData.folderPath.trim() || undefined,
-        techStack: formData.techStack
-      })
+        techStack: formData.techStack,
+      });
     } catch (error) {
-      console.error('Error submitting form:', error)
+      console.error("Error submitting form:", error);
     }
-  }
+  };
 
   const addTech = () => {
-    const tech = techInput.trim()
+    const tech = techInput.trim();
     if (tech && !formData.techStack.includes(tech)) {
       setFormData({
         ...formData,
-        techStack: [...formData.techStack, tech]
-      })
-      setTechInput('')
+        techStack: [...formData.techStack, tech],
+      });
+      setTechInput("");
     }
-  }
+  };
 
   const removeTech = (tech: string) => {
     setFormData({
       ...formData,
-      techStack: formData.techStack.filter(t => t !== tech)
-    })
-  }
+      techStack: formData.techStack.filter((t) => t !== tech),
+    });
+  };
 
   const handleTechInputKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      addTech()
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addTech();
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -94,15 +94,13 @@ export function ProjectForm({ project, onSubmit, onCancel, isLoading }: ProjectF
           id="name"
           value={formData.name}
           onChange={(e) => {
-            setFormData({ ...formData, name: e.target.value })
-            setErrors({ ...errors, name: '' })
+            setFormData({ ...formData, name: e.target.value });
+            setErrors({ ...errors, name: "" });
           }}
           placeholder="My Awesome Project"
           disabled={isLoading}
         />
-        {errors.name && (
-          <p className="text-sm text-destructive">{errors.name}</p>
-        )}
+        {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
       </div>
 
       {/* Description */}
@@ -143,11 +141,7 @@ export function ProjectForm({ project, onSubmit, onCancel, isLoading }: ProjectF
             placeholder="e.g., React, TypeScript, Node.js"
             disabled={isLoading}
           />
-          <Button
-            type="button"
-            onClick={addTech}
-            disabled={isLoading || !techInput.trim()}
-          >
+          <Button type="button" onClick={addTech} disabled={isLoading || !techInput.trim()}>
             Add
           </Button>
         </div>
@@ -173,19 +167,14 @@ export function ProjectForm({ project, onSubmit, onCancel, isLoading }: ProjectF
       {/* Actions */}
       <div className="flex gap-3 justify-end">
         {onCancel && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            disabled={isLoading}
-          >
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
             Cancel
           </Button>
         )}
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Saving...' : project ? 'Update Project' : 'Create Project'}
+          {isLoading ? "Saving..." : project ? "Update Project" : "Create Project"}
         </Button>
       </div>
     </form>
-  )
+  );
 }

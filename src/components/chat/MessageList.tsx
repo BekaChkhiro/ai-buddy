@@ -3,34 +3,34 @@
  * Scrollable list of messages with auto-scroll and loading states
  */
 
-'use client'
+"use client";
 
-import { useEffect, useRef } from 'react'
-import { Message } from '@/hooks/useMessages'
-import { MessageItem } from './MessageItem'
-import { StreamingMessage } from './StreamingMessage'
-import { Button } from '@/components/ui/button'
-import { ArrowDown, Loader2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useEffect, useRef } from "react";
+import { Message } from "@/hooks/useMessages";
+import { MessageItem } from "./MessageItem";
+import { StreamingMessage } from "./StreamingMessage";
+import { Button } from "@/components/ui/button";
+import { ArrowDown, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface MessageListProps {
-  messages: Message[]
-  isStreaming?: boolean
-  streamingContent?: string
-  loading?: boolean
-  hasMore?: boolean
-  onLoadMore?: () => void
-  onStopStreaming?: () => void
-  onEditMessage?: (messageId: string, content: string) => void
-  onDeleteMessage?: (messageId: string) => void
-  onRegenerateMessage?: () => void
-  className?: string
+  messages: Message[];
+  isStreaming?: boolean;
+  streamingContent?: string;
+  loading?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  onStopStreaming?: () => void;
+  onEditMessage?: (messageId: string, content: string) => void;
+  onDeleteMessage?: (messageId: string) => void;
+  onRegenerateMessage?: () => void;
+  className?: string;
 }
 
 export function MessageList({
   messages,
   isStreaming = false,
-  streamingContent = '',
+  streamingContent = "",
   loading = false,
   hasMore = false,
   onLoadMore,
@@ -40,47 +40,47 @@ export function MessageList({
   onRegenerateMessage,
   className,
 }: MessageListProps) {
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const lastScrollTop = useRef(0)
-  const isAutoScrolling = useRef(true)
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const lastScrollTop = useRef(0);
+  const isAutoScrolling = useRef(true);
 
   // Auto-scroll to bottom when new messages arrive or streaming updates
   useEffect(() => {
     if (isAutoScrolling.current && bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, streamingContent])
+  }, [messages, streamingContent]);
 
   // Detect manual scroll to disable auto-scroll
   const handleScroll = () => {
-    if (!scrollRef.current) return
+    if (!scrollRef.current) return;
 
-    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current
-    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
 
     // Enable auto-scroll if near bottom, disable if scrolled up
-    isAutoScrolling.current = isNearBottom
+    isAutoScrolling.current = isNearBottom;
 
     // Detect scroll to top for load more
     if (scrollTop === 0 && scrollTop < lastScrollTop.current && hasMore && onLoadMore && !loading) {
-      onLoadMore()
+      onLoadMore();
     }
 
-    lastScrollTop.current = scrollTop
-  }
+    lastScrollTop.current = scrollTop;
+  };
 
   // Scroll to bottom button click
   const scrollToBottom = () => {
-    isAutoScrolling.current = true
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+    isAutoScrolling.current = true;
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Show scroll to bottom button if not auto-scrolling
-  const showScrollButton = !isAutoScrolling.current && messages.length > 0
+  const showScrollButton = !isAutoScrolling.current && messages.length > 0;
 
   return (
-    <div className={cn('relative flex flex-col h-full', className)}>
+    <div className={cn("relative flex flex-col h-full", className)}>
       {/* Messages container */}
       <div
         ref={scrollRef}
@@ -125,7 +125,7 @@ export function MessageList({
               onEdit={onEditMessage}
               onDelete={onDeleteMessage}
               onRegenerate={
-                index === messages.length - 1 && message.role === 'assistant'
+                index === messages.length - 1 && message.role === "assistant"
                   ? onRegenerateMessage
                   : undefined
               }
@@ -134,9 +134,7 @@ export function MessageList({
         </div>
 
         {/* Streaming message */}
-        {isStreaming && (
-          <StreamingMessage content={streamingContent} onStop={onStopStreaming} />
-        )}
+        {isStreaming && <StreamingMessage content={streamingContent} onStop={onStopStreaming} />}
 
         {/* Loading indicator */}
         {loading && !hasMore && messages.length === 0 && (
@@ -163,5 +161,5 @@ export function MessageList({
         </div>
       )}
     </div>
-  )
+  );
 }

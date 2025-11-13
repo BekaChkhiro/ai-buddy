@@ -17,12 +17,14 @@ A production-ready Next.js 14 application with TypeScript, Tailwind CSS, and com
 ### 1. Core Application Structure
 
 #### Framework & Runtime
+
 - **Next.js 14.2.33** with App Router
 - **React 18** with Server Components
 - **TypeScript 5** with strict mode enabled
 - **Node.js** runtime environment
 
 #### Styling System
+
 - **Tailwind CSS 3.4** with custom configuration
 - Custom design system with HSL color variables
 - Dark mode support (class-based)
@@ -78,6 +80,7 @@ claude-project-manager/
 ### 3. Configuration Details
 
 #### TypeScript (tsconfig.json)
+
 - **Strict Mode:** Fully enabled with all strictness flags
 - **Type Checking:**
   - noUnusedLocals
@@ -86,15 +89,16 @@ claude-project-manager/
   - noUncheckedIndexedAccess
   - noFallthroughCasesInSwitch
 - **Path Aliases:**
-  - @/* → ./src/*
-  - @/components/* → ./src/components/*
-  - @/lib/* → ./src/lib/*
-  - @/hooks/* → ./src/hooks/*
-  - @/types/* → ./src/types/*
-  - @/utils/* → ./src/utils/*
-  - @/app/* → ./src/app/*
+  - @/_ → ./src/_
+  - @/components/_ → ./src/components/_
+  - @/lib/_ → ./src/lib/_
+  - @/hooks/_ → ./src/hooks/_
+  - @/types/_ → ./src/types/_
+  - @/utils/_ → ./src/utils/_
+  - @/app/_ → ./src/app/_
 
 #### Tailwind CSS (tailwind.config.ts)
+
 - **Dark Mode:** Class-based switching
 - **Design System:**
   - CSS custom properties for colors
@@ -107,6 +111,7 @@ claude-project-manager/
   - Font family variables for Geist fonts
 
 #### Next.js (next.config.mjs)
+
 - **Performance:**
   - React Strict Mode enabled
   - SWC minification
@@ -122,6 +127,7 @@ claude-project-manager/
   - Remote image patterns configured
 
 #### ESLint (.eslintrc.json)
+
 - **Extends:**
   - next/core-web-vitals
   - next/typescript
@@ -129,12 +135,13 @@ claude-project-manager/
   - prettier (for integration)
 - **Rules:**
   - Prettier integration as errors
-  - No unused variables (with _ prefix exception)
+  - No unused variables (with \_ prefix exception)
   - No console (except warn/error)
   - Prefer const over let
   - No var keyword
 
 #### Prettier (.prettierrc)
+
 - **Style:**
   - Semicolons: true
   - Single quotes: false
@@ -149,12 +156,14 @@ claude-project-manager/
 Created `.env.local.example` with:
 
 **Required Variables:**
+
 - `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
 - `ANTHROPIC_API_KEY` - Claude API key
 - `PROJECT_ROOT_PATH` - Project root for file system access
 
 **Optional Variables:**
+
 - `NEXT_PUBLIC_APP_URL` - Application base URL
 - `NODE_ENV` - Environment (development/production)
 - `DEBUG` - Debug mode flag
@@ -162,6 +171,7 @@ Created `.env.local.example` with:
 ### 5. Dependencies Installed
 
 #### Production Dependencies
+
 - **next** (14.2.33) - React framework
 - **react** (^18) - UI library
 - **react-dom** (^18) - React DOM renderer
@@ -169,6 +179,7 @@ Created `.env.local.example` with:
 - **tailwind-merge** (^3.3.1) - Tailwind class merger
 
 #### Development Dependencies
+
 - **typescript** (^5) - TypeScript compiler
 - **@types/node** (^20) - Node.js type definitions
 - **@types/react** (^18) - React type definitions
@@ -201,6 +212,7 @@ npm run clean        # Clean build artifacts and node_modules
 ### 7. VS Code Integration
 
 #### Workspace Settings (.vscode/settings.json)
+
 - Format on save enabled
 - Prettier as default formatter
 - ESLint auto-fix on save
@@ -209,6 +221,7 @@ npm run clean        # Clean build artifacts and node_modules
 - File and search exclusions
 
 #### Recommended Extensions (.vscode/extensions.json)
+
 - Prettier - Code formatter
 - ESLint - Linting
 - Tailwind CSS IntelliSense
@@ -247,6 +260,7 @@ npm run clean        # Clean build artifacts and node_modules
 ### 9. Utility Functions
 
 Created `src/lib/utils/cn.ts`:
+
 - Class name merging utility
 - Combines clsx and tailwind-merge
 - Properly typed with TypeScript
@@ -265,6 +279,7 @@ All quality checks passed:
 ## Next Steps
 
 ### 1. Environment Setup
+
 ```bash
 cd /Users/bekachkhirodze/Desktop/claude-project-manager
 cp .env.local.example .env.local
@@ -272,11 +287,13 @@ cp .env.local.example .env.local
 ```
 
 ### 2. Start Development
+
 ```bash
 npm run dev
 ```
 
 ### 3. Begin Development
+
 - Create your first component in `src/components/ui/`
 - Add custom hooks in `src/hooks/`
 - Define types in `src/types/`
@@ -284,6 +301,7 @@ npm run dev
 - Build pages in `src/app/`
 
 ### 4. Recommended Integrations
+
 - Set up Supabase database
 - Configure Anthropic Claude API
 - Add authentication flow
@@ -293,6 +311,7 @@ npm run dev
 ## Production Deployment
 
 The project is ready to deploy to:
+
 - **Vercel** (recommended for Next.js)
 - **Netlify**
 - **AWS Amplify**

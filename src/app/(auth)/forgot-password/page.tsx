@@ -1,83 +1,89 @@
-'use client'
+"use client";
 
 /**
  * Forgot password page
  */
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { sendPasswordResetEmail, isValidEmail } from '@/lib/auth'
-import { useToast } from '@/hooks/use-toast'
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { sendPasswordResetEmail, isValidEmail } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ForgotPasswordPage() {
-  const { toast } = useToast()
-  const [email, setEmail] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [emailSent, setEmailSent] = useState(false)
-  const [error, setError] = useState('')
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
 
     // Validate email
     if (!email) {
-      setError('Email is required')
-      return
+      setError("Email is required");
+      return;
     }
 
     if (!isValidEmail(email)) {
-      setError('Please enter a valid email address')
-      return
+      setError("Please enter a valid email address");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      const result = await sendPasswordResetEmail(email)
+      const result = await sendPasswordResetEmail(email);
 
       if (result.success) {
-        setEmailSent(true)
+        setEmailSent(true);
         toast({
-          title: 'Email sent!',
-          description: 'Check your inbox for password reset instructions.',
-        })
+          title: "Email sent!",
+          description: "Check your inbox for password reset instructions.",
+        });
       } else {
         // For security reasons, we show success even if email doesn't exist
         // This prevents email enumeration attacks
-        setEmailSent(true)
+        setEmailSent(true);
         toast({
-          title: 'Email sent!',
-          description: 'If an account exists with this email, you will receive reset instructions.',
-        })
+          title: "Email sent!",
+          description: "If an account exists with this email, you will receive reset instructions.",
+        });
       }
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred. Please try again.',
-        variant: 'destructive',
-      })
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   if (emailSent) {
     return (
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Check your email</CardTitle>
-          <CardDescription>
-            We&apos;ve sent password reset instructions to {email}
-          </CardDescription>
+          <CardDescription>We&apos;ve sent password reset instructions to {email}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            If you don&apos;t receive an email within a few minutes, please check your spam folder or try again.
+            If you don&apos;t receive an email within a few minutes, please check your spam folder
+            or try again.
           </p>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
@@ -85,19 +91,22 @@ export default function ForgotPasswordPage() {
             variant="outline"
             className="w-full"
             onClick={() => {
-              setEmailSent(false)
-              setEmail('')
+              setEmailSent(false);
+              setEmail("");
             }}
           >
             Try a different email
           </Button>
-          <Link href="/login" className="text-sm text-center text-muted-foreground hover:text-primary flex items-center justify-center gap-2">
+          <Link
+            href="/login"
+            className="text-sm text-center text-muted-foreground hover:text-primary flex items-center justify-center gap-2"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to login
           </Link>
         </CardFooter>
       </Card>
-    )
+    );
   }
 
   return (
@@ -120,11 +129,11 @@ export default function ForgotPasswordPage() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value)
-                setError('')
+                setEmail(e.target.value);
+                setError("");
               }}
               disabled={isLoading}
-              className={error ? 'border-red-500' : ''}
+              className={error ? "border-red-500" : ""}
             />
             {error && <p className="text-sm text-red-500">{error}</p>}
           </div>
@@ -132,15 +141,18 @@ export default function ForgotPasswordPage() {
 
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Sending...' : 'Send reset instructions'}
+            {isLoading ? "Sending..." : "Send reset instructions"}
           </Button>
 
-          <Link href="/login" className="text-sm text-center text-muted-foreground hover:text-primary flex items-center justify-center gap-2">
+          <Link
+            href="/login"
+            className="text-sm text-center text-muted-foreground hover:text-primary flex items-center justify-center gap-2"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to login
           </Link>
         </CardFooter>
       </form>
     </Card>
-  )
+  );
 }

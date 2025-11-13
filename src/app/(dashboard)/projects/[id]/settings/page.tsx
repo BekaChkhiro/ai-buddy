@@ -3,133 +3,133 @@
  * Edit project details and manage project
  */
 
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { ProjectForm, DeleteProjectDialog } from '@/components/projects'
-import { useToast } from '@/hooks/use-toast'
-import { Project, UpdateProjectForm } from '@/types'
-import { ArrowLeft, Trash2 } from 'lucide-react'
-import { Skeleton } from '@/components/ui/skeleton'
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ProjectForm, DeleteProjectDialog } from "@/components/projects";
+import { useToast } from "@/hooks/use-toast";
+import { Project, UpdateProjectForm } from "@/types";
+import { ArrowLeft, Trash2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
-  params: Promise<{ id: string }>
-}
+  params: Promise<{ id: string }>;
+};
 
 export default function ProjectSettingsPage({ params }: Props) {
-  const router = useRouter()
-  const { toast } = useToast()
-  const [projectId, setProjectId] = useState<string>('')
-  const [project, setProject] = useState<Project | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const router = useRouter();
+  const { toast } = useToast();
+  const [projectId, setProjectId] = useState<string>("");
+  const [project, setProject] = useState<Project | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Unwrap params
   useEffect(() => {
-    params.then((p) => setProjectId(p.id))
-  }, [params])
+    params.then((p) => setProjectId(p.id));
+  }, [params]);
 
   // Fetch project data
   useEffect(() => {
-    if (!projectId) return
+    if (!projectId) return;
 
     const fetchProject = async () => {
       try {
-        const response = await fetch(`/api/projects/${projectId}`)
-        const result = await response.json()
+        const response = await fetch(`/api/projects/${projectId}`);
+        const result = await response.json();
 
         if (!response.ok || !result.success) {
-          throw new Error(result.error?.message || 'Failed to fetch project')
+          throw new Error(result.error?.message || "Failed to fetch project");
         }
 
-        setProject(result.data)
+        setProject(result.data);
       } catch (error) {
         toast({
-          title: 'Error',
-          description: error instanceof Error ? error.message : 'Failed to load project',
-          variant: 'destructive',
-        })
-        router.push('/projects')
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to load project",
+          variant: "destructive",
+        });
+        router.push("/projects");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchProject()
-  }, [projectId, router, toast])
+    fetchProject();
+  }, [projectId, router, toast]);
 
   const handleUpdate = async (data: UpdateProjectForm) => {
-    if (!projectId) return
+    if (!projectId) return;
 
-    setIsSaving(true)
+    setIsSaving(true);
     try {
       const response = await fetch(`/api/projects/${projectId}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      })
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error?.message || 'Failed to update project')
+        throw new Error(result.error?.message || "Failed to update project");
       }
 
-      setProject(result.data)
+      setProject(result.data);
       toast({
-        title: 'Project updated',
-        description: 'Your changes have been saved successfully.',
-      })
+        title: "Project updated",
+        description: "Your changes have been saved successfully.",
+      });
     } catch (error) {
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to update project',
-        variant: 'destructive',
-      })
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update project",
+        variant: "destructive",
+      });
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!projectId) return
+    if (!projectId) return;
 
     try {
       const response = await fetch(`/api/projects/${projectId}`, {
-        method: 'DELETE',
-      })
+        method: "DELETE",
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error?.message || 'Failed to delete project')
+        throw new Error(result.error?.message || "Failed to delete project");
       }
 
       toast({
-        title: 'Project deleted',
-        description: 'The project has been permanently deleted.',
-      })
+        title: "Project deleted",
+        description: "The project has been permanently deleted.",
+      });
 
-      router.push('/projects')
+      router.push("/projects");
     } catch (error) {
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to delete project',
-        variant: 'destructive',
-      })
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete project",
+        variant: "destructive",
+      });
     }
-  }
+  };
 
   const handleCancel = () => {
-    router.push(`/projects/${projectId}`)
-  }
+    router.push(`/projects/${projectId}`);
+  };
 
   if (isLoading || !projectId) {
     return (
@@ -143,11 +143,11 @@ export default function ProjectSettingsPage({ params }: Props) {
         </div>
         <Skeleton className="h-96 w-full max-w-3xl" />
       </div>
-    )
+    );
   }
 
   if (!project) {
-    return null
+    return null;
   }
 
   return (
@@ -161,9 +161,7 @@ export default function ProjectSettingsPage({ params }: Props) {
         </Button>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Project Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your project settings and preferences
-          </p>
+          <p className="text-muted-foreground">Manage your project settings and preferences</p>
         </div>
       </div>
 
@@ -171,9 +169,7 @@ export default function ProjectSettingsPage({ params }: Props) {
       <Card className="max-w-3xl">
         <CardHeader>
           <CardTitle>General Settings</CardTitle>
-          <CardDescription>
-            Update your project information and configuration
-          </CardDescription>
+          <CardDescription>Update your project information and configuration</CardDescription>
         </CardHeader>
         <CardContent>
           <ProjectForm
@@ -217,5 +213,5 @@ export default function ProjectSettingsPage({ params }: Props) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

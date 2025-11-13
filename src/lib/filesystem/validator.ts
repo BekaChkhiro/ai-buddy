@@ -3,10 +3,10 @@
  * SECURITY CRITICAL: Prevents directory traversal and unauthorized access
  */
 
-import path from 'path'
-import fs from 'fs/promises'
-import { ValidationError, PermissionError, ValidationResult } from './types'
-import { BLOCKED_PATTERNS } from './constants'
+import path from "path";
+import fs from "fs/promises";
+import { ValidationError, PermissionError, ValidationResult } from "./types";
+import { BLOCKED_PATTERNS } from "./constants";
 
 /**
  * Validate that a path is safe and within project boundaries
@@ -24,57 +24,61 @@ export async function validatePath(
 ): Promise<ValidationResult> {
   try {
     // Normalize and resolve both paths
-    const normalizedProjectPath = path.resolve(projectPath)
-    const normalizedTargetPath = path.resolve(projectPath, targetPath)
+    const normalizedProjectPath = path.resolve(projectPath);
+    const normalizedTargetPath = path.resolve(projectPath, targetPath);
 
     // SECURITY CHECK 1: Ensure target path is within project boundaries
-    if (!normalizedTargetPath.startsWith(normalizedProjectPath + path.sep) &&
-        normalizedTargetPath !== normalizedProjectPath) {
+    if (
+      !normalizedTargetPath.startsWith(normalizedProjectPath + path.sep) &&
+      normalizedTargetPath !== normalizedProjectPath
+    ) {
       return {
         valid: false,
-        error: 'Path is outside project boundaries',
-        reason: 'OUTSIDE_PROJECT'
-      }
+        error: "Path is outside project boundaries",
+        reason: "OUTSIDE_PROJECT",
+      };
     }
 
     // SECURITY CHECK 2: Check for blocked patterns
-    const relativePath = path.relative(normalizedProjectPath, normalizedTargetPath)
+    const relativePath = path.relative(normalizedProjectPath, normalizedTargetPath);
     if (isBlockedPath(relativePath)) {
       return {
         valid: false,
-        error: 'Access to this path is forbidden',
-        reason: 'BLOCKED_PATTERN'
-      }
+        error: "Access to this path is forbidden",
+        reason: "BLOCKED_PATTERN",
+      };
     }
 
     // SECURITY CHECK 3: Ensure no symlink escapes project boundaries
     try {
-      const realPath = await fs.realpath(normalizedTargetPath)
-      if (!realPath.startsWith(normalizedProjectPath + path.sep) &&
-          realPath !== normalizedProjectPath) {
+      const realPath = await fs.realpath(normalizedTargetPath);
+      if (
+        !realPath.startsWith(normalizedProjectPath + path.sep) &&
+        realPath !== normalizedProjectPath
+      ) {
         return {
           valid: false,
-          error: 'Symbolic link points outside project boundaries',
-          reason: 'SYMLINK_ESCAPE'
-        }
+          error: "Symbolic link points outside project boundaries",
+          reason: "SYMLINK_ESCAPE",
+        };
       }
     } catch (error: any) {
       // File doesn't exist yet - that's okay for write operations
-      if (error.code !== 'ENOENT') {
-        throw error
+      if (error.code !== "ENOENT") {
+        throw error;
       }
     }
 
     return {
       valid: true,
-      normalizedPath: normalizedTargetPath
-    }
+      normalizedPath: normalizedTargetPath,
+    };
   } catch (error) {
     return {
       valid: false,
-      error: error instanceof Error ? error.message : 'Validation failed',
-      reason: 'VALIDATION_ERROR'
-    }
+      error: error instanceof Error ? error.message : "Validation failed",
+      reason: "VALIDATION_ERROR",
+    };
   }
 }
 
@@ -91,22 +95,22 @@ export async function validatePathOrThrow(
   projectPath: string,
   targetPath: string
 ): Promise<string> {
-  const result = await validatePath(projectPath, targetPath)
+  const result = await validatePath(projectPath, targetPath);
 
   if (!result.valid) {
-    if (result.reason === 'BLOCKED_PATTERN') {
-      throw new PermissionError(result.error || 'Access forbidden', {
+    if (result.reason === "BLOCKED_PATTERN") {
+      throw new PermissionError(result.error || "Access forbidden", {
         path: targetPath,
-        reason: result.reason
-      })
+        reason: result.reason,
+      });
     }
-    throw new ValidationError(result.error || 'Invalid path', {
+    throw new ValidationError(result.error || "Invalid path", {
       path: targetPath,
-      reason: result.reason
-    })
+      reason: result.reason,
+    });
   }
 
-  return result.normalizedPath!
+  return result.normalizedPath!;
 }
 
 /**
@@ -116,35 +120,33 @@ export async function validatePathOrThrow(
  * @returns true if path should be blocked
  */
 export function isBlockedPath(relativePath: string): boolean {
-  const pathSegments = relativePath.split(path.sep)
-  const fileName = path.basename(relativePath)
+  const pathSegments = relativePath.split(path.sep);
+  const fileName = path.basename(relativePath);
 
   // Check each path segment and the full path against blocked patterns
   for (const pattern of BLOCKED_PATTERNS) {
     // Exact match
     if (pathSegments.includes(pattern) || fileName === pattern) {
-      return true
+      return true;
     }
 
     // Wildcard match (simple implementation)
-    if (pattern.includes('*')) {
-      const regexPattern = pattern
-        .replace(/\./g, '\\.')
-        .replace(/\*/g, '.*')
-      const regex = new RegExp(`^${regexPattern}$`)
+    if (pattern.includes("*")) {
+      const regexPattern = pattern.replace(/\./g, "\\.").replace(/\*/g, ".*");
+      const regex = new RegExp(`^${regexPattern}$`);
 
       if (regex.test(relativePath) || regex.test(fileName)) {
-        return true
+        return true;
       }
     }
 
     // Extension match
-    if (pattern.startsWith('*.') && fileName.endsWith(pattern.substring(1))) {
-      return true
+    if (pattern.startsWith("*.") && fileName.endsWith(pattern.substring(1))) {
+      return true;
     }
   }
 
-  return false
+  return false;
 }
 
 /**
@@ -153,62 +155,60 @@ export function isBlockedPath(relativePath: string): boolean {
  * @param folderPath - The folder path to validate
  * @returns ValidationResult
  */
-export async function validateProjectFolder(
-  folderPath: string
-): Promise<ValidationResult> {
+export async function validateProjectFolder(folderPath: string): Promise<ValidationResult> {
   try {
-    const normalizedPath = path.resolve(folderPath)
+    const normalizedPath = path.resolve(folderPath);
 
     // Check if path exists
     try {
-      const stats = await fs.stat(normalizedPath)
+      const stats = await fs.stat(normalizedPath);
 
       if (!stats.isDirectory()) {
         return {
           valid: false,
-          error: 'Path is not a directory',
-          reason: 'NOT_DIRECTORY'
-        }
+          error: "Path is not a directory",
+          reason: "NOT_DIRECTORY",
+        };
       }
     } catch (error: any) {
-      if (error.code === 'ENOENT') {
+      if (error.code === "ENOENT") {
         return {
           valid: false,
-          error: 'Directory does not exist',
-          reason: 'NOT_FOUND'
-        }
+          error: "Directory does not exist",
+          reason: "NOT_FOUND",
+        };
       }
-      if (error.code === 'EACCES') {
+      if (error.code === "EACCES") {
         return {
           valid: false,
-          error: 'Permission denied',
-          reason: 'PERMISSION_DENIED'
-        }
+          error: "Permission denied",
+          reason: "PERMISSION_DENIED",
+        };
       }
-      throw error
+      throw error;
     }
 
     // Check if we can read the directory
     try {
-      await fs.access(normalizedPath, fs.constants.R_OK)
+      await fs.access(normalizedPath, fs.constants.R_OK);
     } catch (error) {
       return {
         valid: false,
-        error: 'Directory is not readable',
-        reason: 'NOT_READABLE'
-      }
+        error: "Directory is not readable",
+        reason: "NOT_READABLE",
+      };
     }
 
     return {
       valid: true,
-      normalizedPath
-    }
+      normalizedPath,
+    };
   } catch (error) {
     return {
       valid: false,
-      error: error instanceof Error ? error.message : 'Validation failed',
-      reason: 'VALIDATION_ERROR'
-    }
+      error: error instanceof Error ? error.message : "Validation failed",
+      reason: "VALIDATION_ERROR",
+    };
   }
 }
 
@@ -220,13 +220,16 @@ export async function validateProjectFolder(
  * @returns Sanitized path
  */
 export function sanitizePath(filePath: string): string {
-  return filePath
-    // Remove null bytes
-    .replace(/\0/g, '')
-    // Remove leading dots that could be used for traversal
-    .replace(/^\.*\//, '')
-    // Normalize path separators
-    .split(/[/\\]/).join(path.sep)
+  return (
+    filePath
+      // Remove null bytes
+      .replace(/\0/g, "")
+      // Remove leading dots that could be used for traversal
+      .replace(/^\.*\//, "")
+      // Normalize path separators
+      .split(/[/\\]/)
+      .join(path.sep)
+  );
 }
 
 /**
@@ -237,21 +240,18 @@ export function sanitizePath(filePath: string): string {
  * @param targetPath - The target path
  * @returns Relative path from project root
  */
-export function getSafeRelativePath(
-  projectPath: string,
-  targetPath: string
-): string {
-  const normalizedProject = path.resolve(projectPath)
-  const normalizedTarget = path.resolve(targetPath)
+export function getSafeRelativePath(projectPath: string, targetPath: string): string {
+  const normalizedProject = path.resolve(projectPath);
+  const normalizedTarget = path.resolve(targetPath);
 
-  let relativePath = path.relative(normalizedProject, normalizedTarget)
+  let relativePath = path.relative(normalizedProject, normalizedTarget);
 
   // If relative path starts with .., it's outside the project
-  if (relativePath.startsWith('..')) {
-    throw new ValidationError('Path is outside project boundaries')
+  if (relativePath.startsWith("..")) {
+    throw new ValidationError("Path is outside project boundaries");
   }
 
-  return relativePath
+  return relativePath;
 }
 
 /**
@@ -262,12 +262,9 @@ export function getSafeRelativePath(
  * @param allowedExtensions - Set of allowed extensions (e.g., new Set(['.txt', '.md']))
  * @returns true if extension is allowed
  */
-export function hasAllowedExtension(
-  fileName: string,
-  allowedExtensions: Set<string>
-): boolean {
-  const ext = path.extname(fileName).toLowerCase()
-  return allowedExtensions.has(ext)
+export function hasAllowedExtension(fileName: string, allowedExtensions: Set<string>): boolean {
+  const ext = path.extname(fileName).toLowerCase();
+  return allowedExtensions.has(ext);
 }
 
 /**
@@ -278,30 +275,30 @@ export function hasAllowedExtension(
  */
 export function isValidFileName(fileName: string): boolean {
   // File name should not be empty
-  if (!fileName || fileName.trim() === '') {
-    return false
+  if (!fileName || fileName.trim() === "") {
+    return false;
   }
 
   // Should not contain path separators
-  if (fileName.includes('/') || fileName.includes('\\')) {
-    return false
+  if (fileName.includes("/") || fileName.includes("\\")) {
+    return false;
   }
 
   // Should not be . or ..
-  if (fileName === '.' || fileName === '..') {
-    return false
+  if (fileName === "." || fileName === "..") {
+    return false;
   }
 
   // Should not contain null bytes
-  if (fileName.includes('\0')) {
-    return false
+  if (fileName.includes("\0")) {
+    return false;
   }
 
   // Should not contain control characters
   // eslint-disable-next-line no-control-regex
   if (/[\x00-\x1f\x7f]/.test(fileName)) {
-    return false
+    return false;
   }
 
-  return true
+  return true;
 }

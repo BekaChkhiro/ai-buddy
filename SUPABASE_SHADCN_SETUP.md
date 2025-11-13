@@ -85,11 +85,13 @@ Already integrated in `/middleware.ts` to handle session updates on every reques
 To generate TypeScript types from your Supabase schema:
 
 1. Install Supabase CLI globally:
+
    ```bash
    npm install -g supabase
    ```
 
 2. Link your project:
+
    ```bash
    supabase link --project-ref YOUR_PROJECT_ID
    ```
@@ -353,6 +355,7 @@ The following custom brand colors have been added to Tailwind:
 ```
 
 Color palette:
+
 - **brand**: 50-950 scale (blue theme)
 - **success**: Green (#10b981)
 - **warning**: Orange (#f59e0b)
@@ -551,18 +554,22 @@ npx shadcn@latest add table sheet
 ### Common Issues
 
 **1. Supabase client errors**
+
 - Ensure environment variables are set in `.env.local`
 - Restart the development server after adding environment variables
 
 **2. TypeScript errors with Supabase types**
+
 - Run `npm run types:supabase` to regenerate types
 - Make sure your Supabase project is linked
 
 **3. Dark mode not working**
+
 - Ensure ThemeProvider is in your root layout
 - Add `suppressHydrationWarning` to the `<html>` tag
 
 **4. Components not found**
+
 - Run `npx shadcn@latest add [component-name]` to install missing components
 - Check import paths match the components.json configuration
 
@@ -571,6 +578,7 @@ npx shadcn@latest add table sheet
 ## Support
 
 For issues or questions:
+
 - Check the documentation links above
 - Review the example code in this guide
 - Consult the Supabase and shadcn/ui communities

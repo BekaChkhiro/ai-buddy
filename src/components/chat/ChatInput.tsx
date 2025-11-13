@@ -3,85 +3,85 @@
  * Message input with file attachments and send button
  */
 
-'use client'
+"use client";
 
-import { useState, useRef, KeyboardEvent } from 'react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Send, Paperclip, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useState, useRef, KeyboardEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Send, Paperclip, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ChatInputProps {
-  onSend: (message: string, files?: string[]) => void
-  disabled?: boolean
-  placeholder?: string
-  contextFiles?: string[]
-  onContextFilesChange?: (files: string[]) => void
-  className?: string
+  onSend: (message: string, files?: string[]) => void;
+  disabled?: boolean;
+  placeholder?: string;
+  contextFiles?: string[];
+  onContextFilesChange?: (files: string[]) => void;
+  className?: string;
 }
 
 export function ChatInput({
   onSend,
   disabled = false,
-  placeholder = 'Type your message...',
+  placeholder = "Type your message...",
   contextFiles = [],
   onContextFilesChange,
   className,
 }: ChatInputProps) {
-  const [message, setMessage] = useState('')
-  const [selectedFiles, setSelectedFiles] = useState<string[]>(contextFiles)
-  const [showFilePicker, setShowFilePicker] = useState(false)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [message, setMessage] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<string[]>(contextFiles);
+  const [showFilePicker, setShowFilePicker] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle send message
   const handleSend = () => {
-    const trimmedMessage = message.trim()
+    const trimmedMessage = message.trim();
     if (trimmedMessage && !disabled) {
-      onSend(trimmedMessage, selectedFiles.length > 0 ? selectedFiles : undefined)
-      setMessage('')
-      setSelectedFiles([])
+      onSend(trimmedMessage, selectedFiles.length > 0 ? selectedFiles : undefined);
+      setMessage("");
+      setSelectedFiles([]);
 
       // Reset textarea height
       if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto'
+        textareaRef.current.style.height = "auto";
       }
     }
-  }
+  };
 
   // Handle keyboard shortcuts
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     // Send on Enter (without Shift)
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
 
     // Cancel on Escape
-    if (e.key === 'Escape') {
-      setMessage('')
-      setSelectedFiles([])
-      textareaRef.current?.blur()
+    if (e.key === "Escape") {
+      setMessage("");
+      setSelectedFiles([]);
+      textareaRef.current?.blur();
     }
-  }
+  };
 
   // Auto-resize textarea
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value)
+    setMessage(e.target.value);
 
     // Auto-resize
-    e.target.style.height = 'auto'
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`
-  }
+    e.target.style.height = "auto";
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
+  };
 
   // Remove file from context
   const removeFile = (file: string) => {
-    const updatedFiles = selectedFiles.filter((f) => f !== file)
-    setSelectedFiles(updatedFiles)
-    onContextFilesChange?.(updatedFiles)
-  }
+    const updatedFiles = selectedFiles.filter((f) => f !== file);
+    setSelectedFiles(updatedFiles);
+    onContextFilesChange?.(updatedFiles);
+  };
 
   return (
-    <div className={cn('border-t bg-background', className)}>
+    <div className={cn("border-t bg-background", className)}>
       {/* Context files */}
       {selectedFiles.length > 0 && (
         <div className="px-4 py-2 border-b bg-muted/30">
@@ -144,9 +144,9 @@ export function ChatInput({
 
       {/* Quick tips */}
       <div className="px-4 pb-2 text-xs text-muted-foreground">
-        Press <kbd className="px-1 py-0.5 bg-muted rounded">Enter</kbd> to send,{' '}
+        Press <kbd className="px-1 py-0.5 bg-muted rounded">Enter</kbd> to send,{" "}
         <kbd className="px-1 py-0.5 bg-muted rounded">Shift+Enter</kbd> for new line
       </div>
     </div>
-  )
+  );
 }

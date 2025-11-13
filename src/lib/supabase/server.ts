@@ -1,6 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import type { Database } from "@/types/supabase";
+import type { Database } from "@/types/database";
 
 /**
  * Creates a Supabase client for use in Server Components and Route Handlers
@@ -13,9 +13,7 @@ export async function createClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error(
-      "Missing Supabase environment variables. Please check your .env.local file.",
-    );
+    throw new Error("Missing Supabase environment variables. Please check your .env.local file.");
   }
 
   const cookieStore = await cookies();
@@ -48,4 +46,4 @@ export async function createClient() {
 }
 
 // Export alias for consistency
-export { createClient as createServerClient }
+export { createClient as createServerClient };

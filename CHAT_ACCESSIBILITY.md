@@ -3,6 +3,7 @@
 ## Keyboard Shortcuts
 
 ### Global Shortcuts
+
 - `Ctrl/Cmd + N` - Create new conversation
 - `Ctrl/Cmd + K` - Focus search/conversation list
 - `/` - Focus message input
@@ -10,11 +11,13 @@
 - `Ctrl/Cmd + Shift + S` - Toggle sidebar
 
 ### Message Actions
+
 - `Ctrl/Cmd + R` - Regenerate last assistant message
 - `Enter` - Send message (in input field)
 - `Shift + Enter` - New line (in input field)
 
 ### Navigation
+
 - `Tab` - Navigate between interactive elements
 - `Shift + Tab` - Navigate backward
 - `Arrow Up/Down` - Navigate through conversation list
@@ -23,24 +26,28 @@
 ## ARIA Labels and Semantic HTML
 
 ### Message Components
+
 - Each message has proper role attributes (`role="article"`)
 - Message sender identified with `aria-label`
 - Timestamps use `time` element with `datetime` attribute
 - Code blocks have `aria-label` indicating language
 
 ### Interactive Elements
+
 - All buttons have descriptive `aria-label` or visible text
 - Icon-only buttons include text alternatives
 - Loading states use `aria-live="polite"` regions
 - Error messages use `aria-live="assertive"`
 
 ### Forms and Inputs
+
 - Message input has associated label
 - File picker has descriptive label
 - Context file chips are keyboard accessible
 - Form validation errors announced to screen readers
 
 ### Navigation and Structure
+
 - Proper heading hierarchy (h1, h2, h3)
 - Landmark regions (main, aside, navigation)
 - Skip to main content link
@@ -49,17 +56,20 @@
 ## Screen Reader Support
 
 ### Message Reading
+
 - Messages read in chronological order
 - Sender (You/Assistant) announced before content
 - Timestamps read in natural language
 - Code blocks announced with language identifier
 
 ### Streaming Messages
+
 - Streaming status announced (`aria-live="polite"`)
 - "Thinking..." state conveyed to screen readers
 - Stop button clearly labeled and focusable
 
 ### Conversation List
+
 - Current conversation marked with `aria-current="page"`
 - Conversation count announced
 - Empty state has descriptive text
@@ -67,17 +77,20 @@
 ## Focus Management
 
 ### Focus Indicators
+
 - All interactive elements have visible focus rings
 - Focus rings use high contrast colors
 - Custom focus styles match design system
 - Focus order follows visual layout
 
 ### Focus Trapping
+
 - Dialogs trap focus within modal
 - Escape key closes modals and returns focus
 - Tab cycles through dialog elements only
 
 ### Auto-Focus Behavior
+
 - New conversation focuses message input
 - Switching conversations maintains context
 - Error dialogs focus on primary action
@@ -86,18 +99,21 @@
 ## Color and Contrast
 
 ### Text Contrast
+
 - All text meets WCAG AA standards (4.5:1)
 - Important text meets AAA standards (7:1)
 - Code syntax highlighting maintains readability
 - Placeholder text uses sufficient contrast
 
 ### UI Elements
+
 - Buttons have clear visual states (hover, active, focus, disabled)
 - Icons paired with text labels where possible
 - Color not used as sole indicator
 - Dark mode maintains contrast ratios
 
 ### Message Differentiation
+
 - User and assistant messages visually distinct
 - Background colors accessible in both themes
 - Active conversation clearly marked
@@ -106,12 +122,14 @@
 ## Motion and Animation
 
 ### Reduced Motion
+
 - Respects `prefers-reduced-motion` setting
 - Essential animations only
 - Smooth scroll can be disabled
 - Auto-scroll respects user preference
 
 ### Animation Types
+
 - Fade in/out for messages
 - Smooth scroll for new messages
 - Pulse effect for streaming indicator
@@ -120,12 +138,14 @@
 ## Mobile Accessibility
 
 ### Touch Targets
+
 - All interactive elements minimum 44x44px
 - Adequate spacing between touch targets
 - Swipe gestures have alternatives
 - Pinch-to-zoom enabled
 
 ### Mobile Navigation
+
 - Hamburger menu for sidebar
 - Bottom sheet for quick actions
 - One-handed operation support
@@ -134,6 +154,7 @@
 ## Testing
 
 ### Manual Testing Checklist
+
 - [ ] Navigate entire interface with keyboard only
 - [ ] Test with screen reader (NVDA, JAWS, VoiceOver)
 - [ ] Verify color contrast with tools
@@ -144,6 +165,7 @@
 - [ ] Validate HTML with accessibility tools
 
 ### Automated Testing
+
 - ESLint plugin for a11y rules
 - Axe DevTools for runtime checks
 - Lighthouse accessibility audit
@@ -154,6 +176,7 @@
 ### Component-Level Accessibility
 
 #### MessageItem
+
 ```typescript
 <article
   role="article"
@@ -169,6 +192,7 @@
 ```
 
 #### ChatInput
+
 ```typescript
 <div role="region" aria-label="Message input">
   <label htmlFor="message-input" className="sr-only">
@@ -184,6 +208,7 @@
 ```
 
 #### StreamingMessage
+
 ```typescript
 <div
   role="status"

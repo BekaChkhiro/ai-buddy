@@ -3,23 +3,23 @@
  * Lists all user projects
  */
 
-import type { Metadata } from 'next'
-import { createServerClient } from '@/lib/supabase/server'
-import { getProjectsWithStats } from '@/lib/supabase/queries'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Plus, FolderKanban } from 'lucide-react'
-import Link from 'next/link'
-import { ProjectCard } from '@/components/projects'
+import type { Metadata } from "next";
+import { createServerClient } from "@/lib/supabase/server";
+import { getProjectsWithStats } from "@/lib/supabase/queries";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus, FolderKanban } from "lucide-react";
+import Link from "next/link";
+import { ProjectCard } from "@/components/projects";
 
 export const metadata: Metadata = {
-  title: 'Projects',
-  description: 'Manage your projects',
-}
+  title: "Projects",
+  description: "Manage your projects",
+};
 
 export default async function ProjectsPage() {
-  const supabase = await createServerClient()
-  const projects = await getProjectsWithStats(supabase)
+  const supabase = await createServerClient();
+  const projects = await getProjectsWithStats(supabase);
 
   return (
     <div className="space-y-6">
@@ -27,9 +27,7 @@ export default async function ProjectsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <p className="text-muted-foreground">
-            Manage and organize your development projects
-          </p>
+          <p className="text-muted-foreground">Manage and organize your development projects</p>
         </div>
         <Button asChild>
           <Link href="/projects/new">
@@ -64,5 +62,5 @@ export default async function ProjectsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

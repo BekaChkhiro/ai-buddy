@@ -3,7 +3,7 @@
  * Specialized prompts for different contexts
  */
 
-import { ChatContext } from './types'
+import { ChatContext } from "./types";
 
 /**
  * Base system prompt for project management context
@@ -17,7 +17,7 @@ Your capabilities include:
 - Debugging and troubleshooting
 - Documentation and best practices
 
-Always provide clear, actionable advice. When suggesting code, use proper syntax highlighting. When creating tasks, be specific and measurable.`
+Always provide clear, actionable advice. When suggesting code, use proper syntax highlighting. When creating tasks, be specific and measurable.`;
 
 /**
  * Planning mode prompt
@@ -38,7 +38,7 @@ When creating tasks, format them clearly with:
 - Priority (low, medium, high, urgent)
 - Dependencies (if any)
 
-Be thorough but practical. Consider scalability, maintainability, and developer experience.`
+Be thorough but practical. Consider scalability, maintainability, and developer experience.`;
 
 /**
  * Implementation mode prompt
@@ -60,7 +60,7 @@ When providing code:
 - Consider edge cases
 - Add proper error handling
 
-Ensure code is clean, maintainable, and well-documented.`
+Ensure code is clean, maintainable, and well-documented.`;
 
 /**
  * Review mode prompt
@@ -82,7 +82,7 @@ Provide constructive feedback with:
 - Recommended fixes
 - Code examples when helpful
 
-Be thorough but encouraging. Highlight both issues and good practices.`
+Be thorough but encouraging. Highlight both issues and good practices.`;
 
 /**
  * General mode prompt
@@ -96,7 +96,7 @@ You are in GENERAL assistance mode. Help with:
 - Suggesting improvements
 - General development advice
 
-Be helpful, clear, and concise. Ask clarifying questions when needed.`
+Be helpful, clear, and concise. Ask clarifying questions when needed.`;
 
 /**
  * Task extraction prompt
@@ -126,93 +126,90 @@ Format tasks as JSON array:
 ]
 \`\`\`
 
-Only extract clear, actionable tasks. Skip vague or already completed items.`
+Only extract clear, actionable tasks. Skip vague or already completed items.`;
 
 /**
  * Build system prompt based on mode and context
  */
 export function buildSystemPrompt(
-  mode: 'planning' | 'implementation' | 'review' | 'general',
+  mode: "planning" | "implementation" | "review" | "general",
   context?: ChatContext
 ): string {
   // Select base prompt based on mode
-  let prompt = ''
+  let prompt = "";
   switch (mode) {
-    case 'planning':
-      prompt = PLANNING_PROMPT
-      break
-    case 'implementation':
-      prompt = IMPLEMENTATION_PROMPT
-      break
-    case 'review':
-      prompt = REVIEW_PROMPT
-      break
-    case 'general':
+    case "planning":
+      prompt = PLANNING_PROMPT;
+      break;
+    case "implementation":
+      prompt = IMPLEMENTATION_PROMPT;
+      break;
+    case "review":
+      prompt = REVIEW_PROMPT;
+      break;
+    case "general":
     default:
-      prompt = GENERAL_PROMPT
+      prompt = GENERAL_PROMPT;
   }
 
   // Add project context if provided
   if (context) {
-    prompt += '\n\n## PROJECT CONTEXT\n\n'
+    prompt += "\n\n## PROJECT CONTEXT\n\n";
 
-    prompt += `**Project**: ${context.projectName}\n`
+    prompt += `**Project**: ${context.projectName}\n`;
 
     if (context.projectDescription) {
-      prompt += `**Description**: ${context.projectDescription}\n`
+      prompt += `**Description**: ${context.projectDescription}\n`;
     }
 
     if (context.techStack && context.techStack.length > 0) {
-      prompt += `**Tech Stack**: ${context.techStack.join(', ')}\n`
+      prompt += `**Tech Stack**: ${context.techStack.join(", ")}\n`;
     }
 
     if (context.folderPath) {
-      prompt += `**Project Path**: ${context.folderPath}\n`
+      prompt += `**Project Path**: ${context.folderPath}\n`;
     }
 
     // Add recent tasks context
     if (context.recentTasks && context.recentTasks.length > 0) {
-      prompt += '\n**Recent Tasks**:\n'
+      prompt += "\n**Recent Tasks**:\n";
       context.recentTasks.forEach((task, index) => {
-        prompt += `${index + 1}. [${task.status}] ${task.title}`
+        prompt += `${index + 1}. [${task.status}] ${task.title}`;
         if (task.description) {
-          prompt += ` - ${task.description}`
+          prompt += ` - ${task.description}`;
         }
-        prompt += '\n'
-      })
+        prompt += "\n";
+      });
     }
 
     // Add relevant files context
     if (context.relevantFiles && context.relevantFiles.length > 0) {
-      prompt += '\n**Relevant Files**:\n'
+      prompt += "\n**Relevant Files**:\n";
       context.relevantFiles.forEach((file) => {
-        prompt += `\n### ${file.path}\n`
+        prompt += `\n### ${file.path}\n`;
         if (file.language) {
-          prompt += `\`\`\`${file.language}\n${file.content}\n\`\`\`\n`
+          prompt += `\`\`\`${file.language}\n${file.content}\n\`\`\`\n`;
         } else {
-          prompt += `\`\`\`\n${file.content}\n\`\`\`\n`
+          prompt += `\`\`\`\n${file.content}\n\`\`\`\n`;
         }
-      })
+      });
     }
   }
 
-  return prompt
+  return prompt;
 }
 
 /**
  * Build user message with context
  */
-export function buildUserMessage(
-  message: string,
-  additionalContext?: string
-): string {
-  let fullMessage = message
+export function buildUserMessage(message: string, additionalContext?: string): string {
+  let fullMessage = message;
 
   if (additionalContext) {
-    fullMessage += '\n\n---\n\n' + additionalContext
+    fullMessage += "\n\n---\n\n" + additionalContext;
   }
 
-  return fullMessage
+  return fullMessage;
 }
 
 /**
@@ -220,11 +217,11 @@ export function buildUserMessage(
  */
 export function formatConversationHistory(
   history: Array<{ role: string; content: string }>
-): Array<{ role: 'user' | 'assistant'; content: string }> {
+): Array<{ role: "user" | "assistant"; content: string }> {
   return history
-    .filter((msg) => msg.role === 'user' || msg.role === 'assistant')
+    .filter((msg) => msg.role === "user" || msg.role === "assistant")
     .map((msg) => ({
-      role: msg.role as 'user' | 'assistant',
+      role: msg.role as "user" | "assistant",
       content: msg.content,
-    }))
+    }));
 }
