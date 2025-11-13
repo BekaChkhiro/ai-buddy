@@ -5,15 +5,21 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useChat, ChatMode } from "@/hooks/useChat";
+import { useTaskExtraction } from "@/hooks/useTaskExtraction";
 import { ChatSidebar } from "./ChatSidebar";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { QuickActions } from "./QuickActions";
+import { TaskSuggestions } from "@/components/tasks/TaskSuggestions";
+import { TaskReview } from "@/components/tasks/TaskReview";
+import { BulkTaskCreate } from "@/components/tasks/BulkTaskCreate";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sparkles, ListTodo } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ExtractedTask } from "@/lib/claude/task-extraction";
+import { Task } from "@/types";
 
 interface ChatInterfaceProps {
   projectId: string;
@@ -32,6 +38,14 @@ export function ChatInterface({
 }: ChatInterfaceProps) {
   const [sidebarOpen, setSidebarOpen] = useState(showSidebar);
   const [contextFiles, setContextFiles] = useState<string[]>([]);
+
+  // Task extraction state
+  const [showTaskSuggestions, setShowTaskSuggestions] = useState(false);
+  const [showTaskReview, setShowTaskReview] = useState(false);
+  const [showBulkCreate, setShowBulkCreate] = useState(false);
+  const [tasksToReview, setTasksToReview] = useState<ExtractedTask[]>([]);
+  const [tasksToCreate, setTasksToCreate] = useState<ExtractedTask[]>([]);
+  const [showAutoSuggestion, setShowAutoSuggestion] = useState(false);
 
   const {
     conversation,
@@ -57,6 +71,35 @@ export function ChatInterface({
     mode: defaultMode,
     contextFiles,
   });
+
+  const {
+    isExtracting,
+    extractionResult,
+    error: extractionError,
+    extractFromConversation,
+    shouldSuggestExtraction,
+    clearResult,
+  } = useTaskExtraction();
+
+  // Auto-detect task content and suggest extraction
+  useEffect(() => {
+    if (messages.length >= 3 && !isStreaming && !showTaskSuggestions) {
+      const formattedMessages = messages.map((msg) => ({
+        role: msg.role as "user" | "assistant",
+        content: msg.content,
+      }));
+
+      const shouldSuggest = shouldSuggestExtraction(formattedMessages);
+      setShowAutoSuggestion(shouldSuggest);
+    }
+  }, [messages, isStreaming, showTaskSuggestions, shouldSuggestExtraction]);
+
+  // Show task suggestions when extraction completes
+  useEffect(() => {
+    if (extractionResult && extractionResult.tasks.length > 0) {
+      setShowTaskSuggestions(true);
+    }
+  }, [extractionResult]);
 
   // Handle new conversation
   const handleNewConversation = async () => {
@@ -96,6 +139,63 @@ export function ChatInterface({
     // TODO: Implement message deletion
   };
 
+  // Handle manual task extraction
+  const handleExtractTasks = async () => {
+    if (!conversation?.id) return;
+
+    setShowAutoSuggestion(false);
+    await extractFromConversation(conversation.id, {
+      maxTasks: 10,
+      minConfidence: 60,
+      detectDependencies: true,
+      includeTimeEstimates: true,
+    });
+  };
+
+  // Handle task review
+  const handleReviewTasks = (tasks: ExtractedTask[]) => {
+    setTasksToReview(tasks);
+    setShowTaskSuggestions(false);
+    setShowTaskReview(true);
+  };
+
+  // Handle approve tasks
+  const handleApproveTasks = (tasks: ExtractedTask[]) => {
+    setTasksToCreate(tasks);
+    setShowTaskReview(false);
+    setShowBulkCreate(true);
+  };
+
+  // Handle reject tasks
+  const handleRejectTasks = () => {
+    setShowTaskReview(false);
+    setTasksToReview([]);
+  };
+
+  // Handle dismiss suggestions
+  const handleDismissSuggestions = () => {
+    setShowTaskSuggestions(false);
+    setShowAutoSuggestion(false);
+    clearResult();
+  };
+
+  // Handle bulk create complete
+  const handleBulkCreateComplete = (createdTasks: Task[]) => {
+    console.log("Created tasks:", createdTasks);
+    setShowBulkCreate(false);
+    setTasksToCreate([]);
+    setTasksToReview([]);
+    clearResult();
+
+    // Could show a success toast here
+  };
+
+  // Handle bulk create error
+  const handleBulkCreateError = (error: string) => {
+    console.error("Bulk create error:", error);
+    // Could show an error toast here
+  };
+
   return (
     <div className={cn("flex h-full bg-background", className)}>
       {/* Sidebar */}
@@ -132,8 +232,42 @@ export function ChatInterface({
             </div>
           </div>
 
-          {/* Error display */}
-          {error && <div className="text-sm text-destructive">{error}</div>}
+          <div className="flex items-center gap-2">
+            {/* Auto-suggest extraction button */}
+            {showAutoSuggestion && !showTaskSuggestions && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExtractTasks}
+                disabled={isExtracting || !conversation?.id}
+                className="border-purple-500/30 hover:bg-purple-500/10"
+              >
+                <Sparkles className="h-4 w-4 mr-1 text-purple-500" />
+                Extract Tasks
+              </Button>
+            )}
+
+            {/* Manual extraction button */}
+            {messages.length > 0 && !showAutoSuggestion && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleExtractTasks}
+                disabled={isExtracting || !conversation?.id}
+              >
+                <ListTodo className="h-4 w-4 mr-1" />
+                Extract Tasks
+              </Button>
+            )}
+
+            {/* Error display */}
+            {error && <div className="text-sm text-destructive">{error}</div>}
+            {extractionError && (
+              <div className="text-sm text-destructive">
+                Task extraction failed: {extractionError}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Messages or empty state */}
@@ -156,16 +290,34 @@ export function ChatInterface({
               </div>
             </div>
           ) : (
-            <MessageList
-              messages={messages}
-              isStreaming={isStreaming}
-              streamingContent={streamingContent}
-              loading={loadingMessages}
-              onStopStreaming={stopStreaming}
-              onEditMessage={handleEditMessage}
-              onDeleteMessage={handleDeleteMessage}
-              onRegenerateMessage={regenerateLastMessage}
-            />
+            <div className="h-full flex flex-col">
+              <div className="flex-1 overflow-hidden">
+                <MessageList
+                  messages={messages}
+                  isStreaming={isStreaming}
+                  streamingContent={streamingContent}
+                  loading={loadingMessages}
+                  onStopStreaming={stopStreaming}
+                  onEditMessage={handleEditMessage}
+                  onDeleteMessage={handleDeleteMessage}
+                  onRegenerateMessage={regenerateLastMessage}
+                />
+              </div>
+
+              {/* Task Suggestions */}
+              {(showTaskSuggestions || isExtracting) && (
+                <div className="p-4 border-t bg-gray-50/50 dark:bg-gray-900/50">
+                  <TaskSuggestions
+                    tasks={extractionResult?.tasks || []}
+                    summary={extractionResult?.summary}
+                    totalEstimatedHours={extractionResult?.totalEstimatedHours}
+                    loading={isExtracting}
+                    onReview={handleReviewTasks}
+                    onDismiss={handleDismissSuggestions}
+                  />
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -177,6 +329,26 @@ export function ChatInterface({
           onContextFilesChange={setContextFiles}
         />
       </div>
+
+      {/* Task Review Dialog */}
+      <TaskReview
+        tasks={tasksToReview}
+        isOpen={showTaskReview}
+        onClose={() => setShowTaskReview(false)}
+        onApprove={handleApproveTasks}
+        onReject={handleRejectTasks}
+      />
+
+      {/* Bulk Task Create Dialog */}
+      <BulkTaskCreate
+        tasks={tasksToCreate}
+        projectId={projectId}
+        conversationId={conversation?.id}
+        isOpen={showBulkCreate}
+        onClose={() => setShowBulkCreate(false)}
+        onComplete={handleBulkCreateComplete}
+        onError={handleBulkCreateError}
+      />
     </div>
   );
 }
