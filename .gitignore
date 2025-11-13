@@ -35,3 +35,27 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+
+# AI Buddy configuration
+.aibuddy/git-config.json
+.aibuddy/auto-commit-config.json
+.aibuddy/branch-naming.json
+.aibuddy/lfs-config.json
+
+# Git LFS
+.git/lfs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
