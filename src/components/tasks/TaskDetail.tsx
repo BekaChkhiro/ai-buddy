@@ -14,11 +14,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TaskTimeline } from "./TaskTimeline";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ImplementButton } from "@/components/implementation";
 import {
   Calendar,
   Clock,
   Edit,
-  Play,
   User,
   MessageSquare,
   History,
@@ -32,7 +32,6 @@ interface TaskDetailProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit?: () => void;
-  onImplement?: () => void;
   onAddComment?: (content: string) => Promise<void>;
 }
 
@@ -57,7 +56,6 @@ export function TaskDetail({
   open,
   onOpenChange,
   onEdit,
-  onImplement,
   onAddComment,
 }: TaskDetailProps) {
   const [commentContent, setCommentContent] = useState("");
@@ -109,12 +107,15 @@ export function TaskDetail({
                   Edit
                 </Button>
               )}
-              {onImplement && task.status !== "completed" && (
-                <Button size="sm" onClick={onImplement}>
-                  <Play className="h-4 w-4 mr-2" />
-                  Implement
-                </Button>
-              )}
+              {task.status !== "completed" &&
+                task.status !== "failed" &&
+                task.status !== "implementing" && (
+                  <ImplementButton
+                    taskId={task.id}
+                    taskTitle={task.title}
+                    size="sm"
+                  />
+                )}
             </div>
           </div>
         </DialogHeader>

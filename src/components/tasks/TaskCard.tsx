@@ -6,6 +6,7 @@ import { Task, TaskPriority, TaskStatus } from "@/types";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ImplementButton } from "@/components/implementation";
 import {
   Calendar,
   Clock,
@@ -17,6 +18,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
@@ -107,13 +109,32 @@ export function TaskCard({
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
             <DropdownMenuItem onClick={() => onView?.(task)}>
               View Details
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEdit?.(task)}>
               Edit
             </DropdownMenuItem>
+            {task.status !== "completed" &&
+              task.status !== "failed" &&
+              task.status !== "implementing" && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <div className="w-full">
+                      <ImplementButton
+                        taskId={task.id}
+                        taskTitle={task.title}
+                        variant="ghost"
+                        size="sm"
+                        showLabel={true}
+                      />
+                    </div>
+                  </DropdownMenuItem>
+                </>
+              )}
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => onDelete?.(task.id)}
               className="text-destructive"
@@ -141,32 +162,49 @@ export function TaskCard({
           ))}
         </div>
 
-        <div className="flex flex-col gap-2 text-xs text-muted-foreground">
-          {task.dueDate && (
-            <div
-              className={`flex items-center gap-1 ${isOverdue ? "text-destructive font-medium" : ""}`}
-            >
-              <Calendar className="h-3 w-3" />
-              <span>{format(new Date(task.dueDate), "MMM d, yyyy")}</span>
-            </div>
-          )}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-col gap-2 text-xs text-muted-foreground flex-1">
+            {task.dueDate && (
+              <div
+                className={`flex items-center gap-1 ${isOverdue ? "text-destructive font-medium" : ""}`}
+              >
+                <Calendar className="h-3 w-3" />
+                <span>{format(new Date(task.dueDate), "MMM d, yyyy")}</span>
+              </div>
+            )}
 
-          {task.estimatedHours && (
-            <div className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              <span>
-                {task.estimatedHours}h
-                {task.actualHours ? ` / ${task.actualHours}h` : ""}
-              </span>
-            </div>
-          )}
+            {task.estimatedHours && (
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                <span>
+                  {task.estimatedHours}h
+                  {task.actualHours ? ` / ${task.actualHours}h` : ""}
+                </span>
+              </div>
+            )}
 
-          {task.assigneeId && (
-            <div className="flex items-center gap-1">
-              <User className="h-3 w-3" />
-              <span>Assigned</span>
-            </div>
-          )}
+            {task.assigneeId && (
+              <div className="flex items-center gap-1">
+                <User className="h-3 w-3" />
+                <span>Assigned</span>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Implement Button */}
+          {task.status !== "completed" &&
+            task.status !== "failed" &&
+            task.status !== "implementing" && (
+              <div onClick={(e) => e.stopPropagation()}>
+                <ImplementButton
+                  taskId={task.id}
+                  taskTitle={task.title}
+                  variant="outline"
+                  size="sm"
+                  showLabel={false}
+                />
+              </div>
+            )}
         </div>
       </CardContent>
     </Card>
