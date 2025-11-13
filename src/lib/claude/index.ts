@@ -21,5 +21,11 @@ export * from "./context";
 // Streaming
 export * from "./streaming";
 
+// Usage tracking
+export * from "./usage";
+
 // Errors
 export * from "./errors";
+
+// Task extraction
+export * from "./task-extraction";
