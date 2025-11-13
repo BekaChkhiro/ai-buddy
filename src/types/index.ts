@@ -12,6 +12,7 @@ import { Database } from "./database";
 export enum TaskStatus {
   PENDING = "pending",
   IN_PROGRESS = "in_progress",
+  IMPLEMENTING = "implementing",
   COMPLETED = "completed",
   FAILED = "failed",
   BLOCKED = "blocked",
@@ -46,6 +47,9 @@ export type ProjectRow = Database["public"]["Tables"]["projects"]["Row"];
 export type ChatMessageRow = Database["public"]["Tables"]["chat_messages"]["Row"];
 export type TaskRow = Database["public"]["Tables"]["tasks"]["Row"];
 export type TaskExecutionRow = Database["public"]["Tables"]["task_executions"]["Row"];
+export type TaskDependencyRow = Database["public"]["Tables"]["task_dependencies"]["Row"];
+export type TaskCommentRow = Database["public"]["Tables"]["task_comments"]["Row"];
+export type TaskHistoryRow = Database["public"]["Tables"]["task_history"]["Row"];
 
 // =====================================================
 // INSERT TYPES
@@ -56,6 +60,9 @@ export type ProjectInsert = Database["public"]["Tables"]["projects"]["Insert"];
 export type ChatMessageInsert = Database["public"]["Tables"]["chat_messages"]["Insert"];
 export type TaskInsert = Database["public"]["Tables"]["tasks"]["Insert"];
 export type TaskExecutionInsert = Database["public"]["Tables"]["task_executions"]["Insert"];
+export type TaskDependencyInsert = Database["public"]["Tables"]["task_dependencies"]["Insert"];
+export type TaskCommentInsert = Database["public"]["Tables"]["task_comments"]["Insert"];
+export type TaskHistoryInsert = Database["public"]["Tables"]["task_history"]["Insert"];
 
 // =====================================================
 // UPDATE TYPES
@@ -66,6 +73,9 @@ export type ProjectUpdate = Database["public"]["Tables"]["projects"]["Update"];
 export type ChatMessageUpdate = Database["public"]["Tables"]["chat_messages"]["Update"];
 export type TaskUpdate = Database["public"]["Tables"]["tasks"]["Update"];
 export type TaskExecutionUpdate = Database["public"]["Tables"]["task_executions"]["Update"];
+export type TaskDependencyUpdate = Database["public"]["Tables"]["task_dependencies"]["Update"];
+export type TaskCommentUpdate = Database["public"]["Tables"]["task_comments"]["Update"];
+export type TaskHistoryUpdate = Database["public"]["Tables"]["task_history"]["Update"];
 
 // =====================================================
 // APPLICATION INTERFACES
@@ -132,6 +142,14 @@ export interface Task {
   updatedAt: Date;
   implementedAt: Date | null;
   implementationLog: string | null;
+  dueDate: Date | null;
+  assigneeId: string | null;
+  labels: string[];
+  estimatedHours: number | null;
+  actualHours: number | null;
+  startedAt: Date | null;
+  completedAt: Date | null;
+  sortOrder: number;
 }
 
 /**
@@ -159,6 +177,69 @@ export interface TaskExecution {
  */
 export interface TaskExecutionWithProfile extends TaskExecution {
   executor: Profile;
+}
+
+/**
+ * Task Dependency
+ */
+export interface TaskDependency {
+  id: string;
+  taskId: string;
+  dependsOnTaskId: string;
+  dependencyType: "blocks" | "relates_to";
+  createdAt: Date;
+}
+
+/**
+ * Task Comment
+ */
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  userId: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Task Comment with user profile
+ */
+export interface TaskCommentWithProfile extends TaskComment {
+  user: Profile;
+}
+
+/**
+ * Task History Entry
+ */
+export interface TaskHistory {
+  id: string;
+  taskId: string;
+  userId: string;
+  action: string;
+  fieldName: string | null;
+  oldValue: string | null;
+  newValue: string | null;
+  createdAt: Date;
+}
+
+/**
+ * Task History with user profile
+ */
+export interface TaskHistoryWithProfile extends TaskHistory {
+  user: Profile;
+}
+
+/**
+ * Task with all related data
+ */
+export interface TaskWithDetails extends Task {
+  assignee?: Profile | null;
+  dependencies: TaskDependency[];
+  dependents: TaskDependency[];
+  comments: TaskCommentWithProfile[];
+  history: TaskHistoryWithProfile[];
+  executions: TaskExecution[];
 }
 
 // =====================================================
@@ -344,6 +425,14 @@ export function toTask(row: TaskRow): Task {
     updatedAt: new Date(row.updated_at),
     implementedAt: row.implemented_at ? new Date(row.implemented_at) : null,
     implementationLog: row.implementation_log,
+    dueDate: row.due_date ? new Date(row.due_date) : null,
+    assigneeId: row.assignee_id,
+    labels: row.labels,
+    estimatedHours: row.estimated_hours,
+    actualHours: row.actual_hours,
+    startedAt: row.started_at ? new Date(row.started_at) : null,
+    completedAt: row.completed_at ? new Date(row.completed_at) : null,
+    sortOrder: row.sort_order,
   };
 }
 
@@ -359,5 +448,48 @@ export function toTaskExecution(row: TaskExecutionRow): TaskExecution {
     errorLog: row.error_log,
     executedAt: new Date(row.executed_at),
     executedBy: row.executed_by,
+  };
+}
+
+/**
+ * Convert database row to TaskDependency interface
+ */
+export function toTaskDependency(row: TaskDependencyRow): TaskDependency {
+  return {
+    id: row.id,
+    taskId: row.task_id,
+    dependsOnTaskId: row.depends_on_task_id,
+    dependencyType: row.dependency_type,
+    createdAt: new Date(row.created_at),
+  };
+}
+
+/**
+ * Convert database row to TaskComment interface
+ */
+export function toTaskComment(row: TaskCommentRow): TaskComment {
+  return {
+    id: row.id,
+    taskId: row.task_id,
+    userId: row.user_id,
+    content: row.content,
+    createdAt: new Date(row.created_at),
+    updatedAt: new Date(row.updated_at),
+  };
+}
+
+/**
+ * Convert database row to TaskHistory interface
+ */
+export function toTaskHistory(row: TaskHistoryRow): TaskHistory {
+  return {
+    id: row.id,
+    taskId: row.task_id,
+    userId: row.user_id,
+    action: row.action,
+    fieldName: row.field_name,
+    oldValue: row.old_value,
+    newValue: row.new_value,
+    createdAt: new Date(row.created_at),
   };
 }
